@@ -9,7 +9,6 @@ The maximum file upload size is 100 MB.
 
     | **Parameter** | **Description** | **Required** |
     | --- | --- | --- |
-    | Server URL (e.g. https://216.3.128.82) |  | True |
     | API Key |  | False |
     | Source Reliability | Reliability of the source providing the intelligence data. | True |
     | Trust any certificate (not secure) |  | False |
@@ -47,7 +46,7 @@ You can execute these commands from the Cortex XSOAR CLI, as part of an automati
 After you successfully execute a command, a DBot message appears in the War Room with the command details.
 ### cs-falcon-sandbox-scan
 ***
-Get summary information for a given MD5, SHA1 or SHA256 and all the reports generated for any environment ID
+Gets summary information for a given MD5, SHA1, or SHA256 and all the reports generated for any environment ID.
 
 
 #### Base Command
@@ -57,9 +56,9 @@ Get summary information for a given MD5, SHA1 or SHA256 and all the reports gene
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| file | Comma seperated list of file hashes (MD5, SHA1 or SHA256). | Required | 
-| Polling | . Possible values are: true, false. | Optional | 
-| JobID | JobID to retrieve scan results for. | Optional | 
+| file | A comma-separated list of file hashes (MD5, SHA1, or SHA256). | Required | 
+| polling | Whether to poll until there is at least one result. Possible values are: true, false. | Optional | 
+| JobID | The JobID to retrieve scan results for. | Optional | 
 | hide_polling_output | . | Optional | 
 
 
@@ -67,51 +66,51 @@ Get summary information for a given MD5, SHA1 or SHA256 and all the reports gene
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| CrowdStrike.Report.job_id | String | JobID of the report | 
-| CrowdStrike.Report.environment_id | Number | EnvironmentID of the report | 
-| CrowdStrike.Report.environment_description | String | Environment Description | 
-| CrowdStrike.Report.size | Number | Size of the file | 
-| CrowdStrike.Report.type | String | The type of the file | 
+| CrowdStrike.Report.job_id | String | The report job ID. | 
+| CrowdStrike.Report.environment_id | Number | The report environment ID. | 
+| CrowdStrike.Report.environment_description | String | The environment description. | 
+| CrowdStrike.Report.size | Number | The file size. | 
+| CrowdStrike.Report.type | String | The file type. | 
 | CrowdStrike.Report.type_short | String |  | 
 | CrowdStrike.Report.target_url | String |  | 
-| CrowdStrike.Report.state | String | The state of the report | 
+| CrowdStrike.Report.state | String | The report state. | 
 | CrowdStrike.Report.error_type | String |  | 
 | CrowdStrike.Report.error_origin | String |  | 
 | CrowdStrike.Report.submit_name | String | The name of the file when submitted | 
-| CrowdStrike.Report.md5 | String | The md5 hash of the file | 
-| CrowdStrike.Report.sha1 | String | The sha1 hash of the file | 
-| CrowdStrike.Report.sha256 | String | The sha256 hash of the file | 
-| CrowdStrike.Report.sha512 | String | The sha512 hash of the file | 
-| CrowdStrike.Report.ssdeep | String | The ssdeep hash of the file | 
-| CrowdStrike.Report.imphash | String | The imphash hash of the file | 
-| CrowdStrike.Report.av_detect | Number | AV Multiscan range e.g. 50-70 \(min 0, max 100\) | 
-| CrowdStrike.Report.vx_family | String | Malware family of the file | 
+| CrowdStrike.Report.md5 | String | The MD5 hash of the file. | 
+| CrowdStrike.Report.sha1 | String | The SHA1 hash of the file. | 
+| CrowdStrike.Report.sha256 | String | The SHA256 hash of the file. | 
+| CrowdStrike.Report.sha512 | String | The SHA512 hash of the file. | 
+| CrowdStrike.Report.ssdeep | String | The ssdeep hash of the file. | 
+| CrowdStrike.Report.imphash | String | The imphash hash of the file. | 
+| CrowdStrike.Report.av_detect | Number | The AV Multiscan range, for example 50-70 \(min 0, max 100\). | 
+| CrowdStrike.Report.vx_family | String | The file malware family. | 
 | CrowdStrike.Report.url_analysis | Boolean |  | 
 | CrowdStrike.Report.analysis_start_time | Date |  | 
-| CrowdStrike.Report.threat_score | Number | Threat score of the file | 
-| CrowdStrike.Report.interesting | Boolean | If the file was found to be interesting | 
-| CrowdStrike.Report.threat_level | Number | Threat level of the file | 
-| CrowdStrike.Report.verdict | String | The verdict for the file | 
+| CrowdStrike.Report.threat_score | Number | The file threat score. | 
+| CrowdStrike.Report.interesting | Boolean | Whether the file was found to be interesting. | 
+| CrowdStrike.Report.threat_level | Number | The file threat level. | 
+| CrowdStrike.Report.verdict | String | The file verdict. | 
 | CrowdStrike.Report.total_network_connections | Number |  | 
 | CrowdStrike.Report.total_processes | Number |  | 
 | CrowdStrike.Report.total_signatures | Number |  | 
-| CrowdStrike.Report.file_metadata | Object | Metadata of the file | 
-| CrowdStrike.Report.submissions.submission_id | String | The submission id | 
+| CrowdStrike.Report.file_metadata | Object | The file metadata. | 
+| CrowdStrike.Report.submissions.submission_id | String | The submission ID. | 
 | CrowdStrike.Report.submissions.filename | String |  | 
 | CrowdStrike.Report.submissions.url | String |  | 
 | CrowdStrike.Report.submissions.created_at | Date |  | 
 | CrowdStrike.Report.network_mode | String |  | 
-| File.SHA256 | string | SHA256 of the file | 
-| File.SHA1 | string | SHA1 of the file | 
-| File.MD5 | string | MD5 of the file | 
-| File.Name | string | Submission name of the file | 
-| File.MalwareFamily | string | Family classification of the file | 
-| File.Malicious.Vendor | string | or malicious files, the vendor that made the decision | 
-| File.Malicious.Description | string | For malicious files, the reason for the vendor to make the decision | 
-| DBotScore.Indicator | string | The indicator we tested | 
-| DBotScore.Type | string | The type of the indicator | 
-| DBotScore.Vendor | string | Vendor used to calculate the score | 
-| DBotScore.Score | number | The actual score | 
+| File.SHA256 | string | The SHA256 hash of the file. | 
+| File.SHA1 | string | The SHA1 hash of the file. | 
+| File.MD5 | string | The MD5 hash of the file. | 
+| File.Name | string | The file submission name. | 
+| File.MalwareFamily | string | The file family classification. | 
+| File.Malicious.Vendor | string | The vendor that decided the file was malicious. | 
+| File.Malicious.Description | string | The reason the vendor decided the file was malicious. | 
+| DBotScore.Indicator | string | The tested indicator. | 
+| DBotScore.Type | string | The indicator type. | 
+| DBotScore.Vendor | string | The vendor used to calculate the score. | 
+| DBotScore.Score | number | The actual score. | 
 
 #### Command example
 ```!cs-falcon-sandbox-scan file=8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51,9745bd652c50ac081e28981b96f41230c1ed2f84724c1e5b0f0d407a90aefe22```
@@ -926,7 +925,7 @@ Get summary information for a given MD5, SHA1 or SHA256 and all the reports gene
 
 ### cs-falcon-sandbox-get-environments
 ***
-Get a list of all available environments
+Gets a list of all available environments.
 
 
 #### Base Command
@@ -942,13 +941,13 @@ Get a list of all available environments
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| CrowdStrike.Environment.ID | number | Environment ID | 
-| CrowdStrike.Environment.description | string | Environment description | 
-| CrowdStrike.Environment.architecture | string | Environment architecture | 
-| CrowdStrike.Environment.VMs_total | number | Total virtual machines in environment | 
-| CrowdStrike.Environment.VMs_busy | number | Busy virtual machines in environment | 
-| CrowdStrike.Environment.analysisMode | string | Analysis mode of environment  | 
-| CrowdStrike.Environment.groupicon | string | Icon of environment | 
+| CrowdStrike.Environment.ID | number | The environment ID. | 
+| CrowdStrike.Environment.description | string | The environment description. | 
+| CrowdStrike.Environment.architecture | string | The environment architecture. | 
+| CrowdStrike.Environment.VMs_total | number | The total number of virtual machines in the environment. | 
+| CrowdStrike.Environment.VMs_busy | number | The number of busy virtual machines in the environment. | 
+| CrowdStrike.Environment.analysisMode | string | The environment analysis mode. | 
+| CrowdStrike.Environment.groupicon | string | The environment icon. | 
 
 #### Command example
 ```!cs-falcon-sandbox-get-environments```
@@ -1024,7 +1023,7 @@ Get a list of all available environments
 
 #### Human Readable Output
 
->### All Environments:
+>### Execution Environments:
 >|_ID|Description|Architecture|Total VMS|Busy VMS|Analysis mode|Group icon|
 >|---|---|---|---|---|---|---|
 >| 100 | Windows 7 32 bit | WINDOWS | 9223372036854775807 | 9223372036854775807 | KERNELMODE | windows |
@@ -1036,7 +1035,7 @@ Get a list of all available environments
 
 ### cs-falcon-sandbox-submit-sample
 ***
-Submit a file from investigation to analysis server
+Submits a file from the investigation to the analysis server.
 
 
 #### Base Command
@@ -1046,107 +1045,85 @@ Submit a file from investigation to analysis server
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| entryId | War room entry Id. | Required | 
-| environmentID | Environment ID. Available environments ID: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. Default is 100. | Required | 
-| Polling | Whether the command should poll until the result is ready. Possible values are: true, false. | Optional | 
+| entryId | The War Room entry ID. | Required | 
+| environmentID | The environment ID. Available environment IDs: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. Default is 100. | Required | 
+| polling | Whether the command should poll until the result is ready. Possible values are: true, false. | Optional | 
 | no_share_third_party | When set to 'true', the sample is never shared with any third party. Possible values are: true, false. | Optional | 
-| no_hash_lookup | When set to 'true', the sample is never shared with any third party. Possible values are: true, false. | Optional | 
-| allow_community_access | When set to 'true', the sample will be available for the community. Possible values are: true, false. | Optional | 
+| no_hash_lookup | When set to 'true', no hash lookup is done on the sample. Possible values are: true, false. | Optional | 
+| allow_community_access | When set to 'true', the sample is available for the community. Possible values are: true, false. | Optional | 
 | action_script | Optional custom runtime action script. Available runtime scripts: default, default_maxantievasion, default_randomfiles, default_randomtheme, default_openie. Possible values are: default, default_maxantievasion, default_randomfiles, default_randomtheme, default_openie. | Optional | 
-| hybrid_analysis | When set to 'false', no memory dumps or memory dump analysis will take place. Possible values are: true, false. | Optional | 
-| experimental_anti_evasion | When set to 'true', will set all experimental anti-evasion options of the Kernelmode Monitor. Possible values are: true, false. | Optional | 
-| script_logging | When set to 'true', will set the in-depth script logging engine of the Kernelmode Monitor. Possible values are: true, false. | Optional | 
-| input_sample_tampering | When set to 'true', will allow experimental anti-evasion options of the Kernelmode Monitor that tamper with the input sample. Possible values are: true, false. | Optional | 
-| network_settings | Network settings, by the default, fully operating network is set. Available options: default: 'Fully operating network', tor: 'Route network traffic via TOR', simulated: 'Simulate network traffic'. Possible values are: default, tor, simulated. | Optional | 
-| email | Optional E-Mail address that may be associated with the submission for notification. | Optional | 
-| comment | Optional comment text that may be associated with the submission/sample (Note: you can use #tags here). | Optional | 
-| custom_cmd_line | Optional commandline that should be passed to the analysis file. | Optional | 
+| hybrid_analysis | When set to 'false', no memory dump or memory dump analysis is done. Possible values are: true, false. | Optional | 
+| experimental_anti_evasion | When set to 'true', sets all Kernelmode Monitor experimental anti-evasion options. Possible values are: true, false. | Optional | 
+| script_logging | When set to 'true', sets the Kernelmode Monitor in-depth script logging engine. Possible values are: true, false. | Optional | 
+| input_sample_tampering | When set to 'true', allows Kernelmode Monitor experimental anti-evasion options that tamper with the input sample. Possible values are: true, false. | Optional | 
+| network_settings | Network settings. Available options: default: 'Fully operating network', tor: 'Route network traffic via TOR', simulated: 'Simulate network traffic'. Possible values are: default, tor, simulated. | Optional | 
+| email | Optional email address that may be associated with the submission for notification. | Optional | 
+| comment | Optional comment text that may be associated with the submission/sample (Note: you can use #tags). | Optional | 
+| custom_cmd_line | Optional command line that should be passed to the analysis file. | Optional | 
 | custom_run_time | Optional runtime duration (in seconds). | Optional | 
 | submit_name | Optional runtime duration (in seconds). | Optional | 
-| priority | Optional priority value between 1 (lowest) and 10 (highest), by default all samples run with highest priority. Possible values are: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. | Optional | 
-| document_password | Optional document password that will be used to fill-in Adobe/Office password prompts. | Optional | 
-| environment_variable | Optional system environment value. The value is provided in the format: name=value. | Optional | 
+| priority | Optional priority value between 1 (lowest) and 10 (highest). By default all samples run with highest priority. Possible values are: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. | Optional | 
+| document_password | Optional document password used to fill in Adobe/Office password prompts. | Optional | 
+| environment_variable | Optional system environment value. The value is provided in the format name=value. | Optional | 
 
 
 #### Context Output
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| CrowdStrike.Submit.job_id | String | The JobID of the file | 
-| CrowdStrike.Submit.submission_id | String | The submission id | 
-| CrowdStrike.Submit.environment_id | Number | The environment id for the report | 
-| CrowdStrike.Submit.sha256 | String | The sha256 hash of the file | 
-| CrowdStrike.Report.job_id | String | The JobID of the file | 
-| CrowdStrike.Report.environment_id | Number | The environment id of the report | 
+| CrowdStrike.Submit.job_id | String | The submitted report job ID. | 
+| CrowdStrike.Submit.submission_id | String | The report submission ID. | 
+| CrowdStrike.Submit.environment_id | Number | The report environment ID. | 
+| CrowdStrike.Submit.sha256 | String | The SHA256 hash of the file. | 
+| CrowdStrike.Report.job_id | String | The report job ID. | 
+| CrowdStrike.Report.environment_id | Number | The report environment ID. | 
 | CrowdStrike.Report.environment_description | String |  | 
-| CrowdStrike.Report.size | Number | The size of the file | 
-| CrowdStrike.Report.type | String | The type of the file | 
+| CrowdStrike.Report.size | Number | The file size. | 
+| CrowdStrike.Report.type | String | The file type. | 
 | CrowdStrike.Report.type_short | String |  | 
 | CrowdStrike.Report.target_url | String |  | 
-| CrowdStrike.Report.state | String | The state of the report | 
+| CrowdStrike.Report.state | String | The report state. | 
 | CrowdStrike.Report.error_type | String |  | 
 | CrowdStrike.Report.error_origin | String |  | 
-| CrowdStrike.Report.submit_name | String | The name of the file when submitted | 
-| CrowdStrike.Report.md5 | String | The md5 hash of the file | 
-| CrowdStrike.Report.sha1 | String | The sha1 hash of the file | 
-| CrowdStrike.Report.sha256 | String | The sha256 hash of the file | 
-| CrowdStrike.Report.sha512 | String | The sha512 hash of the file | 
-| CrowdStrike.Report.ssdeep | String | The ssdeep hash of the file | 
-| CrowdStrike.Report.imphash | String | The imphash hash of the file | 
-| CrowdStrike.Report.av_detect | Number | AV Multiscan range e.g. 50-70 \(min 0, max 100\) | 
-| CrowdStrike.Report.vx_family | String | Malware family of the file | 
+| CrowdStrike.Report.submit_name | String | The name of the file when submitted. | 
+| CrowdStrike.Report.md5 | String | The MD5 hash of the file. | 
+| CrowdStrike.Report.sha1 | String | The SHA1 hash of the file. | 
+| CrowdStrike.Report.sha256 | String | The SHA256 hash of the file. | 
+| CrowdStrike.Report.sha512 | String | The SHA512 hash of the file. | 
+| CrowdStrike.Report.ssdeep | String | The ssdeep hash of the file. | 
+| CrowdStrike.Report.imphash | String | The imphash hash of the file. | 
+| CrowdStrike.Report.av_detect | Number | The AV Multiscan range, for example 50-70 \(min 0, max 100\). | 
+| CrowdStrike.Report.vx_family | String | The file malware family. | 
 | CrowdStrike.Report.url_analysis | Boolean |  | 
 | CrowdStrike.Report.analysis_start_time | Date |  | 
-| CrowdStrike.Report.threat_score | Number | Threat score of the file | 
-| CrowdStrike.Report.interesting | Boolean | If the file was found to be interesting | 
-| CrowdStrike.Report.threat_level | Number | Threat level of the file | 
-| CrowdStrike.Report.verdict | String | The verdict for the file | 
+| CrowdStrike.Report.threat_score | Number | The file threat score. | 
+| CrowdStrike.Report.interesting | Boolean | Whether the file was found to be interesting. | 
+| CrowdStrike.Report.threat_level | Number | The file threat level. | 
+| CrowdStrike.Report.verdict | String | The file verdict. | 
 | CrowdStrike.Report.total_network_connections | Number |  | 
 | CrowdStrike.Report.total_processes | Number |  | 
 | CrowdStrike.Report.total_signatures | Number |  | 
-| CrowdStrike.Report.file_metadata | Object | Metadata for the file | 
-| CrowdStrike.Report.submissions.submission_id | String | The submission id | 
+| CrowdStrike.Report.file_metadata | Object | The file metadata. | 
+| CrowdStrike.Report.submissions.submission_id | String | The submission ID | 
 | CrowdStrike.Report.submissions.filename | String |  | 
 | CrowdStrike.Report.submissions.url | String |  | 
 | CrowdStrike.Report.submissions.created_at | Date |  | 
 | CrowdStrike.Report.network_mode | String |  | 
-| File.SHA256 | string | SHA256 of the file | 
-| File.SHA1 | string | SHA1 of the file | 
-| File.MD5 | string | MD5 of the file | 
-| File.Name | string | Submission name of the file | 
-| File.MalwareFamily | string | Family classification of the file | 
-| File.Malicious.Vendor | string | or malicious files, the vendor that made the decision | 
-| File.Malicious.Description | string | For malicious files, the reason for the vendor to make the decision | 
-| DBotScore.Indicator | string | The indicator we tested | 
-| DBotScore.Type | string | The type of the indicator | 
-| DBotScore.Vendor | string | Vendor used to calculate the score | 
-| DBotScore.Score | number | The actual score | 
-
-#### Command example
-```!cs-falcon-sandbox-submit-sample entryId=32@79b78cc9-bcb2-4809-83d9-af37b51872bc environmentID=100 Polling=true```
-#### Context Example
-```json
-{
-    "CrowdStrike": {
-        "EnvironmentID": 100,
-        "JobID": "61e7c8d198a53c7fd06f4a11",
-        "Submit": {
-            "environment_id": 100,
-            "job_id": "61e7c8d198a53c7fd06f4a11",
-            "sha256": "30f681972fc2c2c03b3a82f0f97555e160c5ac74fe4a6bbc3ebbab6a1a69ef18",
-            "submission_id": "61e7c8d198a53c7fd06f4a12"
-        }
-    }
-}
-```
-
-#### Human Readable Output
-
->Fetching Results:
+| File.SHA256 | string | The SHA256 hash of the file. | 
+| File.SHA1 | string | The SHA1 hash of the file | 
+| File.MD5 | string | The MD5 hash of the file. | 
+| File.Name | string | The file submission name. | 
+| File.MalwareFamily | string | The file family classification. | 
+| File.Malicious.Vendor | string | The vendor that decided the file was malicious. | 
+| File.Malicious.Description | string | The reason the vendor decided the file was malicious. | 
+| DBotScore.Indicator | string | The tested indicator. | 
+| DBotScore.Type | string | The indicator type. | 
+| DBotScore.Vendor | string | The vendor used to calculate the score. | 
+| DBotScore.Score | number | The actual score. | 
 
 ### cs-falcon-sandbox-search
 ***
-Search the database using the Falcon Sandbox search syntax
+Searches the database using the Falcon Sandbox search syntax.
 
 
 #### Base Command
@@ -1156,36 +1133,36 @@ Search the database using the Falcon Sandbox search syntax
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| query | Falcon Sandbox query syntax, e.g. url:google,host:95.181.53.78. This argument integrates all other arguments to one, and cannot be given along with the other arguments. | Optional | 
-| filename | Filename e.g. invoice.exe. | Optional | 
-| filetype | Available options: 64bits, android, assembly, bat, cmd, com, csv, data, doc, docx, elf, empty, executable, flash, html, hwp, hwpx, img, iqy, java, javascript, library, lnk, macho, mshelp, msi, native, neexe, office, outlook, pdf, pedll, peexe, perl, ppt, pptx, ps, pub, python, rtf, script, sct, sh, svg, text, url, vbe, vbs, wsf, xls, xlsx. | Optional | 
-| filetype_desc | Filetype description e.g. PE32 executable. | Optional | 
-| env_id | Environment Id. | Optional | 
-| country | Country (3 digit ISO) e.g. swe. | Optional | 
-| verdict | Verdict of search result. Possible values are: Whitelisted, NoVerdict, NoSpecificThreat, Suspicious, Malicious. | Optional | 
-| av_detect | AV Multiscan range e.g. 50-70 (min 0, max 100). | Optional | 
-| vx_family | AV Family Substring e.g. nemucod. | Optional | 
-| tag | Hashtag e.g. ransomware. | Optional | 
-| date_from | Date from in format: 'Y-m-d H:i' e.g. 2018-09-28 15:30. | Optional | 
-| date_to | Date to in format: 'Y-m-d H:i' e.g. 2018-09-28 15:30. | Optional | 
-| port | Port e.g. 8080. | Optional | 
-| host | Host e.g. 192.168.0.1. | Optional | 
-| domain | Domain e.g. checkip.dyndns.org. | Optional | 
-| url | HTTP Request Substring e.g. google. | Optional | 
-| similar_to | Similar Samples e.g. &lt;sha256&gt;. | Optional | 
-| context | Sample Context e.g. &lt;sha256&gt;. | Optional | 
-| imp_hash | Import Hash. | Optional | 
-| ssdeep | SSDeep. | Optional | 
-| authentihash | Authentihash of the file. | Optional | 
+| query | The Falcon Sandbox query syntax, for example url:google,host:95.181.53.78. This argument integrates all other arguments into one and cannot be given along with the other arguments. | Optional | 
+| filename | The file name, for example invoice.exe. | Optional | 
+| filetype | The file type. Available options: 64bits, android, assembly, bat, cmd, com, csv, data, doc, docx, elf, empty, executable, flash, html, hwp, hwpx, img, iqy, java, javascript, library, lnk, macho, mshelp, msi, native, neexe, office, outlook, pdf, pedll, peexe, perl, ppt, pptx, ps, pub, python, rtf, script, sct, sh, svg, text, url, vbe, vbs, wsf, xls, xlsx. | Optional | 
+| filetype_desc | The file type description, for example PE32 executable. | Optional | 
+| env_id | The environment ID. | Optional | 
+| country | The country (3 digit ISO), for example swe. | Optional | 
+| verdict | The search result verdict. Available options: Whitelisted, NoVerdict, NoSpecificThreat, Suspicious, Malicious. Possible values are: Whitelisted, NoVerdict, NoSpecificThreat, Suspicious, Malicious. | Optional | 
+| av_detect | The AV Multiscan range, for example 50-70 (min 0, max 100). | Optional | 
+| vx_family | The AV Family Substring, for example nemucod. | Optional | 
+| tag | The hashtag, for example ransomware. | Optional | 
+| date_from | The date from in format 'YYYY-MM-DD HH:MM', for example 2018-09-28 15:30. | Optional | 
+| date_to | The date to in format 'YYYY-MM-DD HH:MM', for example 2018-09-28 15:30. | Optional | 
+| port | The port, for example 8080. | Optional | 
+| host | The host, for example 192.168.0.1. | Optional | 
+| domain | The domain, for example checkip.dyndns.org. | Optional | 
+| url | The HTTP request substring, for example google. | Optional | 
+| similar_to | Similar samples, for example &lt;sha256&gt;. | Optional | 
+| context | Sample context, for example &lt;sha256&gt;. | Optional | 
+| imp_hash | The import hash. | Optional | 
+| ssdeep | The SSDeep hash. | Optional | 
+| authentihash | The file authentihash. | Optional | 
 
 
 #### Context Output
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| File.SHA256 | string | SHA256 of the file | 
-| File.Name | string | Submission name of the file | 
-| File.MalwareFamily | string | Family classification of the file | 
+| File.SHA256 | string | The SHA256 hash of the file. | 
+| File.Name | string | The file submission name. | 
+| File.MalwareFamily | string | The file family classification. | 
 | File.Extension | string |  | 
 | File.MalwareFamily | String | The malware family associated with the file. | 
 | CrowdStrike.Search.search_terms.id | String |  | 
@@ -2604,7 +2581,7 @@ Search the database using the Falcon Sandbox search syntax
 
 ### cs-falcon-sandbox-result
 ***
-Retrieve result data upon a file. NOTE - This command returns a file
+Retrieves result data on a file. Note: This command returns a file.
 
 
 #### Base Command
@@ -2614,79 +2591,73 @@ Retrieve result data upon a file. NOTE - This command returns a file
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| Polling | Whether the command should poll until the result is ready. Possible values are: true, false. Default is True. | Optional | 
-| file | File hash (MD5, SHA1 or SHA256). | Optional | 
+| polling | Whether the command should poll until the result is ready. Possible values are: true, false. Default is True. | Optional | 
+| file | The file hash (MD5, SHA1, or SHA256). | Optional | 
 | hide_polling_output | . | Optional | 
-| environmentID | Environment ID. Available environments ID: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. | Optional | 
-| JobID | Job ID of file to generate report for. | Optional | 
-| file-type | Type of the file. Possible values are: xml, json, html, pdf, maec, stix, misp, misp-json, openioc, . Default is pdf. | Optional | 
+| environmentID | The environment ID. Available environment IDs: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. | Optional | 
+| JobID | The file job ID to generate a report for. | Optional | 
+| file-type | The file type. Possible values are: xml, json, html, pdf, maec, stix, misp, misp-json, openioc. Default is pdf. | Optional | 
 
 
 #### Context Output
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| CrowdStrike.Report.job_id | String | The JobID of the file | 
-| CrowdStrike.Report.environment_id | Number | The environment id of the report | 
+| CrowdStrike.Report.job_id | String | The file job ID. | 
+| CrowdStrike.Report.environment_id | Number | The report environment ID. | 
 | CrowdStrike.Report.environment_description | String |  | 
-| CrowdStrike.Report.size | Number | The size of the file | 
-| CrowdStrike.Report.type | String | The type of the file | 
+| CrowdStrike.Report.size | Number | The file size. | 
+| CrowdStrike.Report.type | String | The file type. | 
 | CrowdStrike.Report.type_short | String |  | 
 | CrowdStrike.Report.target_url | String |  | 
-| CrowdStrike.Report.state | String | The state of the report | 
+| CrowdStrike.Report.state | String | The report state. | 
 | CrowdStrike.Report.error_type | String |  | 
 | CrowdStrike.Report.error_origin | String |  | 
-| CrowdStrike.Report.submit_name | String | The name of the file when submitted | 
-| CrowdStrike.Report.md5 | String | The md5 hash of the file | 
-| CrowdStrike.Report.sha1 | String | The sha1 hash of the file | 
-| CrowdStrike.Report.sha256 | String | The sha256 hash of the file | 
-| CrowdStrike.Report.sha512 | String | The sha512 hash of the file | 
-| CrowdStrike.Report.ssdeep | String | The ssdeep hash of the file | 
-| CrowdStrike.Report.imphash | String | The imphash hash of the file | 
-| CrowdStrike.Report.av_detect | Number | AV Multiscan range e.g. 50-70 \(min 0, max 100\) | 
-| CrowdStrike.Report.vx_family | String | Malware family of the file | 
+| CrowdStrike.Report.submit_name | String | The file name when submitted. | 
+| CrowdStrike.Report.md5 | String | The MD5 hash of the file. | 
+| CrowdStrike.Report.sha1 | String | The SHA1 hash of the file. | 
+| CrowdStrike.Report.sha256 | String | The SHA256 hash of the file. | 
+| CrowdStrike.Report.sha512 | String | The SHA512 hash of the file. | 
+| CrowdStrike.Report.ssdeep | String | The SSDeep hash of the file. | 
+| CrowdStrike.Report.imphash | String | The imphash hash of the file. | 
+| CrowdStrike.Report.av_detect | Number | The AV Multiscan range, for example 50-70 \(min 0, max 100\). | 
+| CrowdStrike.Report.vx_family | String | Rhe file malware family. | 
 | CrowdStrike.Report.url_analysis | Boolean |  | 
 | CrowdStrike.Report.analysis_start_time | Date |  | 
-| CrowdStrike.Report.threat_score | Number | Threat score of the file | 
-| CrowdStrike.Report.interesting | Boolean | If the file was found to be interesting | 
-| CrowdStrike.Report.threat_level | Number | Threat level of the file | 
-| CrowdStrike.Report.verdict | String | The verdict for the file | 
+| CrowdStrike.Report.threat_score | Number | The file threat score. | 
+| CrowdStrike.Report.interesting | Boolean | Whether the file was found to be interesting. | 
+| CrowdStrike.Report.threat_level | Number | The file threat level. | 
+| CrowdStrike.Report.verdict | String | The file verdict. | 
 | CrowdStrike.Report.total_network_connections | Number |  | 
 | CrowdStrike.Report.total_processes | Number |  | 
 | CrowdStrike.Report.total_signatures | Number |  | 
-| CrowdStrike.Report.file_metadata | Object | Metadata for the file | 
-| CrowdStrike.Report.submissions.submission_id | String | The submission id | 
+| CrowdStrike.Report.file_metadata | Object | The file metadata. | 
+| CrowdStrike.Report.submissions.submission_id | String |  | 
 | CrowdStrike.Report.submissions.filename | String |  | 
 | CrowdStrike.Report.submissions.url | String |  | 
 | CrowdStrike.Report.submissions.created_at | Date |  | 
 | CrowdStrike.Report.network_mode | String |  | 
-| File.SHA256 | string | SHA256 of the file | 
-| File.SHA1 | string | SHA1 of the file | 
-| File.MD5 | string | MD5 of the file | 
-| File.Name | string | Submission name of the file | 
-| File.MalwareFamily | string | Family classification of the file | 
-| File.Malicious.Vendor | string | or malicious files, the vendor that made the decision | 
-| File.Malicious.Description | string | For malicious files, the reason for the vendor to make the decision | 
-| DBotScore.Indicator | string | The indicator we tested | 
-| DBotScore.Type | string | The type of the indicator | 
-| DBotScore.Vendor | string | Vendor used to calculate the score | 
-| DBotScore.Score | number | The actual score | 
-| InfoFile.Name | string | File name. | 
-| InfoFile.EntryID | string | File entry ID. | 
-| InfoFile.Size | number | File size. | 
-| InfoFile.Type | string | File type, e.g., "PE". | 
-| InfoFile.Info | string | Basic information of the file. | 
-| InfoFile.Extension | string | File extension. | 
-
-#### Command example
-```!cs-falcon-sandbox-result JobID=61e7bb4a7b5a2c0e1f2a62dd file-type=misp```
-#### Human Readable Output
-
->Fetching Results:
+| File.SHA256 | string | The SHA256 hash of the file. | 
+| File.SHA1 | string | The SHA1 hash of the file. | 
+| File.MD5 | string | The MD5 hash of the file. | 
+| File.Name | string | The file submission name. | 
+| File.MalwareFamily | string | The file family classification. | 
+| File.Malicious.Vendor | string | The vendor that decided the file was malicious. | 
+| File.Malicious.Description | string | The reason the vendor decided the file was malicious. | 
+| DBotScore.Indicator | string | The tested indicator. | 
+| DBotScore.Type | string | The indicator type. | 
+| DBotScore.Vendor | string | The vendor used to calculate the score. | 
+| DBotScore.Score | number | The actual score. | 
+| InfoFile.Name | string | The file name. | 
+| InfoFile.EntryID | string | The file entry ID. | 
+| InfoFile.Size | number | The file size. | 
+| InfoFile.Type | string | The file type, for example "PE". | 
+| InfoFile.Info | string | Basic information about the file. | 
+| InfoFile.Extension | string | The file extension. | 
 
 ### cs-falcon-sandbox-submit-url
 ***
-Submit a URL for analysis
+Submits a URL for analysis.
 
 
 #### Base Command
@@ -2696,82 +2667,82 @@ Submit a URL for analysis
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| url | url for analyze or url of file to submit. | Required | 
-| environmentID | Environment ID. Available environments ID: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. Default is 100. | Required | 
-| Polling | Whether the command should poll until the result is ready. Possible values are: true, false. | Optional | 
+| url | The URL for analysis or the URL of the file to submit. | Required | 
+| environmentID | The environment ID. Available environment IDs: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. Default is 100. | Required | 
+| polling | Whether the command should poll until the result is ready. Possible values are: true, false. | Optional | 
 | no_share_third_party | When set to 'true', the sample is never shared with any third party. Possible values are: true, false. | Optional | 
-| no_hash_lookup | When set to 'true', the sample is never shared with any third party. Possible values are: true, false. | Optional | 
-| allow_community_access | When set to 'true', the sample will be available for the community. Possible values are: true, false. | Optional | 
+| no_hash_lookup | When set to 'true', no hash lookup is done on the sample. Possible values are: true, false. | Optional | 
+| allow_community_access | When set to 'true', the sample is available for the community. Possible values are: true, false. | Optional | 
 | action_script | Optional custom runtime action script. Available runtime scripts: default, default_maxantievasion, default_randomfiles, default_randomtheme, default_openie. Possible values are: default, default_maxantievasion, default_randomfiles, default_randomtheme, default_openie. | Optional | 
-| hybrid_analysis | When set to 'false', no memory dumps or memory dump analysis will take place. Possible values are: true, false. | Optional | 
-| experimental_anti_evasion | When set to 'true', will set all experimental anti-evasion options of the Kernelmode Monitor. Possible values are: true, false. | Optional | 
-| script_logging | When set to 'true', will set the in-depth script logging engine of the Kernelmode Monitor. Possible values are: true, false. | Optional | 
-| input_sample_tampering | When set to 'true', will allow experimental anti-evasion options of the Kernelmode Monitor that tamper with the input sample. Possible values are: true, false. | Optional | 
-| network_settings | Network settings, by the default, fully operating network is set. Available options: default: 'Fully operating network', tor: 'Route network traffic via TOR', simulated: 'Simulate network traffic'. Possible values are: default, tor, simulated. | Optional | 
-| email | Optional E-Mail address that may be associated with the submission for notification. | Optional | 
-| comment | Optional comment text that may be associated with the submission/sample (Note: you can use #tags here). | Optional | 
-| custom_cmd_line | Optional commandline that should be passed to the analysis file. | Optional | 
+| hybrid_analysis | When set to 'false', no memory dump or memory dump analysis is done. Possible values are: true, false. | Optional | 
+| experimental_anti_evasion | When set to 'true', sets all Kernelmode Monitor experimental anti-evasion options. Possible values are: true, false. | Optional | 
+| script_logging | When set to 'true', sets the Kernelmode Monitor in-depth script logging engine. Possible values are: true, false. | Optional | 
+| input_sample_tampering | When set to 'true', allows Kernelmode Monitor experimental anti-evasion options that tamper with the input sample. Possible values are: true, false. | Optional | 
+| network_settings | Network settings. Available options: default: 'Fully operating network', tor: 'Route network traffic via TOR', simulated: 'Simulate network traffic'. Possible values are: default, tor, simulated. | Optional | 
+| email | Optional email address that may be associated with the submission for notification. | Optional | 
+| comment | Optional comment text that may be associated with the submission/sample (Note: you can use #tags). | Optional | 
+| custom_cmd_line | Optional command line that should be passed to the analysis file. | Optional | 
 | custom_run_time | Optional runtime duration (in seconds). | Optional | 
 | submit_name | Optional runtime duration (in seconds). | Optional | 
-| priority | Optional priority value between 1 (lowest) and 10 (highest), by default all samples run with highest priority. Possible values are: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. | Optional | 
-| document_password | Optional document password that will be used to fill-in Adobe/Office password prompts. | Optional | 
-| environment_variable | Optional system environment value. The value is provided in the format: name=value. | Optional | 
+| priority | Optional priority value between 1 (lowest) and 10 (highest). By default all samples run with highest priority. Possible values are: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. | Optional | 
+| document_password | Optional document password used to fill in Adobe/Office password prompts. | Optional | 
+| environment_variable | Optional system environment value. The value is provided in the format name=value. | Optional | 
 
 
 #### Context Output
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| CrowdStrike.Submit.job_id | String | The JobID of the file | 
+| CrowdStrike.Submit.job_id | String | The The submitted report job ID. | 
 | CrowdStrike.Submit.submission_type | String |  | 
-| CrowdStrike.Submit.submission_id | String | The submission id | 
-| CrowdStrike.Submit.environment_id | Number | The environment id for the submission | 
-| CrowdStrike.Submit.sha256 | String | The sha256 hash of the file | 
-| CrowdStrike.Report.job_id | String | The JobID of the file | 
-| CrowdStrike.Report.environment_id | Number | The environment id of the report | 
+| CrowdStrike.Submit.submission_id | String | The submission ID. | 
+| CrowdStrike.Submit.environment_id | Number | The submission environment ID. | 
+| CrowdStrike.Submit.sha256 | String | The SHA256 hash of the file. | 
+| CrowdStrike.Report.job_id | String | The report job ID. | 
+| CrowdStrike.Report.environment_id | Number | The report environment ID. | 
 | CrowdStrike.Report.environment_description | String |  | 
-| CrowdStrike.Report.size | Number | The size of the file | 
-| CrowdStrike.Report.type | String | The type of the file | 
+| CrowdStrike.Report.size | Number | The file size. | 
+| CrowdStrike.Report.type | String | The file type. | 
 | CrowdStrike.Report.type_short | String |  | 
 | CrowdStrike.Report.target_url | String |  | 
-| CrowdStrike.Report.state | String | The state of the report | 
+| CrowdStrike.Report.state | String | The report state. | 
 | CrowdStrike.Report.error_type | String |  | 
 | CrowdStrike.Report.error_origin | String |  | 
-| CrowdStrike.Report.submit_name | String | The name of the file when submitted | 
-| CrowdStrike.Report.md5 | String | The md5 hash of the file | 
-| CrowdStrike.Report.sha1 | String | The sha1 hash of the file | 
-| CrowdStrike.Report.sha256 | String | The sha256 hash of the file | 
-| CrowdStrike.Report.sha512 | String | The sha512 hash of the file | 
-| CrowdStrike.Report.ssdeep | String | The ssdeep hash of the file | 
-| CrowdStrike.Report.imphash | String | The imphash hash of the file | 
-| CrowdStrike.Report.av_detect | Number | AV Multiscan range e.g. 50-70 \(min 0, max 100\) | 
-| CrowdStrike.Report.vx_family | String | Malware family of the file | 
+| CrowdStrike.Report.submit_name | String | The file name when submitted. | 
+| CrowdStrike.Report.md5 | String | The MD5 hash of the file. | 
+| CrowdStrike.Report.sha1 | String | The SHA1 hash of the file. | 
+| CrowdStrike.Report.sha256 | String | The SHA256 hash of the file. | 
+| CrowdStrike.Report.sha512 | String | The SHA512 hash of the file. | 
+| CrowdStrike.Report.ssdeep | String | The SSDeep hash of the file. | 
+| CrowdStrike.Report.imphash | String | The imphash hash of the file. | 
+| CrowdStrike.Report.av_detect | Number | The AV Multiscan range, for example 50-70 \(min 0, max 100\) | 
+| CrowdStrike.Report.vx_family | String | The file malware famil. | 
 | CrowdStrike.Report.url_analysis | Boolean |  | 
 | CrowdStrike.Report.analysis_start_time | Date |  | 
-| CrowdStrike.Report.threat_score | Number | Threat score of the file | 
-| CrowdStrike.Report.interesting | Boolean | If the file was found to be interesting | 
-| CrowdStrike.Report.threat_level | Number | Threat level of the file | 
-| CrowdStrike.Report.verdict | String | The verdict for the file | 
+| CrowdStrike.Report.threat_score | Number | The file threat score. | 
+| CrowdStrike.Report.interesting | Boolean | Whether the file was found to be interesting. | 
+| CrowdStrike.Report.threat_level | Number | The file threat level. | 
+| CrowdStrike.Report.verdict | String | The file verdict. | 
 | CrowdStrike.Report.total_network_connections | Number |  | 
 | CrowdStrike.Report.total_processes | Number |  | 
 | CrowdStrike.Report.total_signatures | Number |  | 
-| CrowdStrike.Report.file_metadata | Object | Metadata for the file | 
-| CrowdStrike.Report.submissions.submission_id | String | The submission id | 
+| CrowdStrike.Report.file_metadata | Object | The file metadata. | 
+| CrowdStrike.Report.submissions.submission_id | String | The submission ID. | 
 | CrowdStrike.Report.submissions.filename | String |  | 
 | CrowdStrike.Report.submissions.url | String |  | 
 | CrowdStrike.Report.submissions.created_at | Date |  | 
 | CrowdStrike.Report.network_mode | String |  | 
-| File.SHA256 | string | SHA256 of the file | 
-| File.SHA1 | string | SHA1 of the file | 
-| File.MD5 | string | MD5 of the file | 
-| File.Name | string | Submission name of the file | 
-| File.MalwareFamily | string | Family classification of the file | 
-| File.Malicious.Vendor | string | or malicious files, the vendor that made the decision | 
-| File.Malicious.Description | string | For malicious files, the reason for the vendor to make the decision | 
-| DBotScore.Indicator | string | The indicator we tested | 
-| DBotScore.Type | string | The type of the indicator | 
-| DBotScore.Vendor | string | Vendor used to calculate the score | 
-| DBotScore.Score | number | The actual score | 
+| File.SHA256 | string | The SHA256 hash of the file. | 
+| File.SHA1 | string | The SHA1 hash of the file. | 
+| File.MD5 | string | The MD5 hash of the file. | 
+| File.Name | string | The file submission name. | 
+| File.MalwareFamily | string | The file family classification. | 
+| File.Malicious.Vendor | string | The vendor that decided the file was malicious. | 
+| File.Malicious.Description | string | The reason the vendor decided the file was malicious. | 
+| DBotScore.Indicator | string | The tested indicator. | 
+| DBotScore.Type | string | The indicator type. | 
+| DBotScore.Vendor | string | The vendor used to calculate the score. | 
+| DBotScore.Score | number | The actual score. | 
 
 #### Command example
 ```!cs-falcon-sandbox-submit-url url=example.com environmentID=300```
@@ -2780,7 +2751,7 @@ Submit a URL for analysis
 {
     "CrowdStrike": {
         "EnvironmentID": 300,
-        "JobID": "61f005beb81f4f5ecf486561",
+        "JobID": "61f7a5f99741de6d6100bbc8",
         "Report": [
             {
                 "analysis_start_time": "2020-02-03T08:39:15+00:00",
@@ -2952,9 +2923,9 @@ Submit a URL for analysis
         ],
         "Submit": {
             "environment_id": 300,
-            "job_id": "61f005beb81f4f5ecf486561",
+            "job_id": "61f7a5f99741de6d6100bbc8",
             "sha256": "0b1d27c7ef8651eac6933608d4cb0a4b9fd74c45b883d5a4da1eeaa540f6cc5c",
-            "submission_id": "61f005beb81f4f5ecf486562",
+            "submission_id": "61f7a5f99741de6d6100bbc9",
             "submission_type": "page_url"
         }
     },
@@ -3157,25 +3128,25 @@ Retrieves screenshots from a report
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| file | the sha256 hash of a file. | Optional | 
-| environmentID | Environment ID. Available environments ID: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. | Optional | 
-| JobID | Job ID of file. | Optional | 
+| file | The sha256 hash of a file. | Optional | 
+| environmentID | The environment ID. Available environment IDs: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. | Optional | 
+| JobID | The file job ID. | Optional | 
 
 
 #### Context Output
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| InfoFile.Name | string | File name. | 
-| InfoFile.EntryID | string | File entry ID. | 
-| InfoFile.Size | number | File size. | 
-| InfoFile.Type | string | File type, e.g., "PE". | 
-| InfoFile.Info | string | Basic information of the file. | 
-| InfoFile.Extension | string | File extension. | 
+| InfoFile.Name | string | The file name. | 
+| InfoFile.EntryID | string | The file entry ID. | 
+| InfoFile.Size | number | The file size. | 
+| InfoFile.Type | string | The file type, for example "PE". | 
+| InfoFile.Info | string | Basic information about the file. | 
+| InfoFile.Extension | string | The file extension. | 
 
 ### cs-falcon-sandbox-analysis-overview
 ***
-get overview for hash
+Gets the hash overview.
 
 
 #### Base Command
@@ -3185,14 +3156,14 @@ get overview for hash
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| file | The sha256 hash of a file. | Required | 
+| file | The SHA256 hash of the file. | Required | 
 
 
 #### Context Output
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| CrowdStrike.AnalysisOverview.sha256 | String | SHA256 of the file | 
+| CrowdStrike.AnalysisOverview.sha256 | String | The SHA256 hash of the file. | 
 | CrowdStrike.AnalysisOverview.last_file_name | String |  | 
 | CrowdStrike.AnalysisOverview.threat_score | Number |  | 
 | CrowdStrike.AnalysisOverview.verdict | String |  | 
@@ -3235,7 +3206,7 @@ get overview for hash
             "children_in_progress": 0,
             "children_in_queue": 0,
             "last_file_name": "file",
-            "last_multi_scan": "2022-01-25T14:05:41+00:00",
+            "last_multi_scan": "2022-01-25T14:15:07+00:00",
             "multiscan_result": 0,
             "other_file_name": [
                 "5_Journals_3_Manuscripts_10_Version_1_Revision_0_CoverLetter.pdf",
@@ -3500,7 +3471,7 @@ get overview for hash
 
 ### cs-falcon-sandbox-analysis-overview-summary
 ***
-return overview for hash
+Returns the hash overview.
 
 
 #### Base Command
@@ -3510,16 +3481,16 @@ return overview for hash
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| file | The sha256 hash of a file. | Required | 
+| file | The SHA256 hash of the file. | Required | 
 
 
 #### Context Output
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| CrowdStrike.AnalysisOverviewSummary.sha256 | String | The sha256 hash of the file | 
-| CrowdStrike.AnalysisOverviewSummary.threat_score | Number | Threat score of the file | 
-| CrowdStrike.AnalysisOverviewSummary.verdict | String | The verdict for the file | 
+| CrowdStrike.AnalysisOverviewSummary.sha256 | String | The SHA256 hash of the file. | 
+| CrowdStrike.AnalysisOverviewSummary.threat_score | Number | The file threat score. | 
+| CrowdStrike.AnalysisOverviewSummary.verdict | String | The file verdict. | 
 | CrowdStrike.AnalysisOverviewSummary.analysis_start_time | Date |  | 
 | CrowdStrike.AnalysisOverviewSummary.last_multi_scan | Date |  | 
 | CrowdStrike.AnalysisOverviewSummary.multiscan_result | Number |  | 
@@ -3530,9 +3501,9 @@ return overview for hash
 ```json
 {
     "CrowdStrike": {
-        "AnalysisOverviewSummary": {
+        "AnalysisOverview": {
             "analysis_start_time": "2022-01-10T08:33:11+00:00",
-            "last_multi_scan": "2022-01-25T14:05:41+00:00",
+            "last_multi_scan": "2022-01-25T14:15:07+00:00",
             "multiscan_result": 0,
             "sha256": "8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51",
             "threat_score": null,
@@ -3547,12 +3518,12 @@ return overview for hash
 >### Analysis Overview Summary:
 >|Analysis Start Time|Last Multi Scan|Multiscan Result|Sha256|Verdict|
 >|---|---|---|---|---|
->| 2022-01-10T08:33:11+00:00 | 2022-01-25T14:05:41+00:00 | 0 | 8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51 | whitelisted |
+>| 2022-01-10T08:33:11+00:00 | 2022-01-25T14:15:07+00:00 | 0 | 8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51 | whitelisted |
 
 
 ### cs-falcon-sandbox-analysis-overview-refresh
 ***
-refresh overview and download fresh data from external services
+Refreshes the overview and downloads fresh data from external services.
 
 
 #### Base Command
@@ -3562,7 +3533,7 @@ refresh overview and download fresh data from external services
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| file | The sha256 hash of a file. | Required | 
+| file | The SHA256 hash of the file. | Required | 
 
 
 #### Context Output
@@ -3576,7 +3547,7 @@ There is no context output for this command.
 
 ### file
 ***
-Return file's information and reputation
+Return file information and reputation.
 
 
 #### Base Command
@@ -3586,58 +3557,58 @@ Return file's information and reputation
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| file | Comman sepperated list of File hashes (MD5, SHA1 or SHA256). | Required | 
+| file | A comma-separated list of file hashes (MD5, SHA1, or SHA256). | Required | 
 
 
 #### Context Output
 
 | **Path** | **Type** | **Description** |
 | --- | --- | --- |
-| CrowdStrike.Report.job_id | String | The JobID of the file | 
-| CrowdStrike.Report.environment_id | Number | The environment id of the report | 
+| CrowdStrike.Report.job_id | String | The file job ID. | 
+| CrowdStrike.Report.environment_id | Number | The report environment ID. | 
 | CrowdStrike.Report.environment_description | String |  | 
-| CrowdStrike.Report.size | Number | The size of the file | 
-| CrowdStrike.Report.type | String | The type of the file | 
+| CrowdStrike.Report.size | Number | The file size. | 
+| CrowdStrike.Report.type | String | The file type. | 
 | CrowdStrike.Report.type_short | String |  | 
 | CrowdStrike.Report.target_url | String |  | 
-| CrowdStrike.Report.state | String | The state of the report | 
+| CrowdStrike.Report.state | String | The report state. | 
 | CrowdStrike.Report.error_type | String |  | 
 | CrowdStrike.Report.error_origin | String |  | 
-| CrowdStrike.Report.submit_name | String | The name of the file when submitted | 
-| CrowdStrike.Report.md5 | String | The md5 hash of the file | 
-| CrowdStrike.Report.sha1 | String | The sha1 hash of the file | 
-| CrowdStrike.Report.sha256 | String | The sha256 hash of the file | 
-| CrowdStrike.Report.sha512 | String | The sha512 hash of the file | 
-| CrowdStrike.Report.ssdeep | String | The ssdeep hash of the file | 
-| CrowdStrike.Report.imphash | String | The imphash hash of the file | 
-| CrowdStrike.Report.av_detect | Number | AV Multiscan range e.g. 50-70 \(min 0, max 100\) | 
-| CrowdStrike.Report.vx_family | String | Malware family of the file | 
+| CrowdStrike.Report.submit_name | String | The file name when submitted. | 
+| CrowdStrike.Report.md5 | String | The MD5 hash of the file. | 
+| CrowdStrike.Report.sha1 | String | The SHA1 hash of the file. | 
+| CrowdStrike.Report.sha256 | String | The SHA256 hash of the file. | 
+| CrowdStrike.Report.sha512 | String | The SHA512 hash of the file. | 
+| CrowdStrike.Report.ssdeep | String | The SSDeep hash of the file. | 
+| CrowdStrike.Report.imphash | String | The imphash hash of the file. | 
+| CrowdStrike.Report.av_detect | Number | The AV Multiscan range, for example 50-70 \(min 0, max 100\). | 
+| CrowdStrike.Report.vx_family | String | The file malware family. | 
 | CrowdStrike.Report.url_analysis | Boolean |  | 
 | CrowdStrike.Report.analysis_start_time | Date |  | 
-| CrowdStrike.Report.threat_score | Number | Threat score of the file | 
-| CrowdStrike.Report.interesting | Boolean | If the file was found to be interesting | 
-| CrowdStrike.Report.threat_level | Number | Threat level of the file | 
-| CrowdStrike.Report.verdict | String | The verdict for the file | 
+| CrowdStrike.Report.threat_score | Number | The file threat score. | 
+| CrowdStrike.Report.interesting | Boolean | Whether the file was found to be interesting. | 
+| CrowdStrike.Report.threat_level | Number | The file threat level. | 
+| CrowdStrike.Report.verdict | String | The file verdict. | 
 | CrowdStrike.Report.total_network_connections | Number |  | 
 | CrowdStrike.Report.total_processes | Number |  | 
 | CrowdStrike.Report.total_signatures | Number |  | 
-| CrowdStrike.Report.file_metadata | Object | Metadata for the file | 
-| CrowdStrike.Report.submissions.submission_id | String | The submission id | 
+| CrowdStrike.Report.file_metadata | Object | The file metadata. | 
+| CrowdStrike.Report.submissions.submission_id | String | The submission ID. | 
 | CrowdStrike.Report.submissions.filename | String |  | 
 | CrowdStrike.Report.submissions.url | String |  | 
 | CrowdStrike.Report.submissions.created_at | Date |  | 
 | CrowdStrike.Report.network_mode | String |  | 
-| File.SHA256 | string | SHA256 of the file | 
-| File.SHA1 | string | SHA1 of the file | 
-| File.MD5 | string | MD5 of the file | 
-| File.Name | string | Submission name of the file | 
-| File.MalwareFamily | string | Family classification of the file | 
-| File.Malicious.Vendor | string | or malicious files, the vendor that made the decision | 
-| File.Malicious.Description | string | For malicious files, the reason for the vendor to make the decision | 
-| DBotScore.Indicator | string | The indicator we tested | 
-| DBotScore.Type | string | The type of the indicator | 
-| DBotScore.Vendor | string | Vendor used to calculate the score | 
-| DBotScore.Score | number | The actual score | 
+| File.SHA256 | string | The SHA256 hash of the file. | 
+| File.SHA1 | string | The SHA1 hash of the file. | 
+| File.MD5 | string | The MD5 hash of the file. | 
+| File.Name | string | The file submission name. | 
+| File.MalwareFamily | string | The file family classification. | 
+| File.Malicious.Vendor | string | The vendor that decided the file was malicious. | 
+| File.Malicious.Description | string | The reason the vendor decided the file was malicious. | 
+| DBotScore.Indicator | string | The tested indicator. | 
+| DBotScore.Type | string | The indicator type. | 
+| DBotScore.Vendor | string | The vendor used to calculate the score. | 
+| DBotScore.Score | number | The actual score. | 
 
 #### Command example
 ```!file file=8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51```
@@ -4331,7 +4302,7 @@ Return file's information and reputation
 
 ### cs-falcon-sandbox-sample-download
 ***
-download sample file
+Downloads the sample file.
 
 
 #### Base Command
@@ -4341,7 +4312,7 @@ download sample file
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| file | The SHA256 hash of a file. | Required | 
+| file | The SHA256 hash of the file. | Required | 
 
 
 #### Context Output
@@ -4352,11 +4323,11 @@ download sample file
 | File.SHA256 | String | The SHA256 hash of the file. | 
 | File.SHA512 | String | The SHA512 hash of the file. | 
 | File.SSDeep | String | The SSDeep hash of the file. | 
-| File.EntryID | String | EntryID of the file | 
+| File.EntryID | String | The file entry ID. | 
 | File.Info | String | Information about the file. | 
 | File.Type | String | The file type. | 
 | File.MD5 | String | The MD5 hash of the file. | 
-| File.Extension | String | The extension of the file. | 
+| File.Extension | String | The file extension. | 
 
 #### Command example
 ```!cs-falcon-sandbox-sample-download file=8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51```
@@ -4364,11 +4335,11 @@ download sample file
 ```json
 {
     "File": {
-        "EntryID": "376@1013e056-98e6-4320-8b9f-c3ab37488edc",
+        "EntryID": "321@f80880ff-f5c9-4e8f-843b-3fcfb6f8c1c6",
         "Extension": "gz",
         "Info": "gz",
         "MD5": "227f491cfca844bc56127216c956c59a",
-        "Name": "8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51.gz",
+        "Name": "8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51.bin.sample.gz",
         "SHA1": "cc71f378f875b1daa6c462195301ddb8025d0d2f",
         "SHA256": "1801097bfc747e5fab03e194a79c88e665b14f7510950d6702f27096ca41b85d",
         "SHA512": "22464de2b59147cae9f7289308dd5a0e54686840c0a13032173705a280d1918c2aa40b6406dc756b8145ba2c3cea2abb3f5dca93e2ba3b7f8be2704419d12e9b",
@@ -4381,11 +4352,11 @@ download sample file
 
 #### Human Readable Output
 
->Requested sample is available for download under the name 8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51.gz
+>Requested sample is available for download under the name 8decc8571946d4cd70a024949e033a2a2a54377fe9f1c1b944c20f9ee11a9e51.bin.sample.gz
 
 ### cs-falcon-sandbox-report-state
 ***
-Get the report state for the given ID
+Gets the report state for the given ID.
 
 
 #### Base Command
@@ -4395,8 +4366,8 @@ Get the report state for the given ID
 
 | **Argument Name** | **Description** | **Required** |
 | --- | --- | --- |
-| JobID | Job ID of file. | Optional | 
-| environmentID | Environment ID. Available environments ID: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. | Optional | 
+| JobID | The file job ID. | Optional | 
+| environmentID | The environment ID. Available environment IDs: 300: "Linux (Ubuntu 16.04, 64 bit)"", 200: "Android Static Analysis", 120: "Windows 7 64 bit", 110: "Windows 7 32 bit (HWP Support)", 100: "Windows 7 32 bit". Possible values are: 100, 110, 120, 200, 300. | Optional | 
 | file | The hash of the file. | Optional | 
 
 
