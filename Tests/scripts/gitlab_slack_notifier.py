@@ -1,14 +1,17 @@
 import argparse
+from datetime import datetime, timedelta
+import json
 import logging
 import os
 from typing import Tuple, Optional
-
+import requests
 import gitlab
 from slack import WebClient as SlackClient
 
 from Tests.Marketplace.marketplace_services import get_upload_data
 from Tests.Marketplace.marketplace_constants import BucketUploadFlow
 from Tests.scripts.utils.log_util import install_logging
+from demisto_sdk.commands.coverage_analyze.tools import get_coverage
 
 DEMISTO_GREY_ICON = 'https://3xqz5p387rui1hjtdv1up7lw-wpengine.netdna-ssl.com/wp-content/' \
                     'uploads/2018/07/Demisto-Icon-Dark.png'
@@ -182,6 +185,7 @@ def construct_slack_msg(triggering_workflow, pipeline_url, pipeline_failed_jobs)
         color = 'good'
 
     content_fields = []
+    slack_msg = []
     failed_jobs_names = {job.name for job in pipeline_failed_jobs}
     if failed_jobs_names:
         content_fields.append({
@@ -202,14 +206,15 @@ def construct_slack_msg(triggering_workflow, pipeline_url, pipeline_failed_jobs)
         content_fields += bucket_upload_results()
     if 'content nightly' in triggering_workflow_lower:
         content_fields += test_playbooks_results()
+        slack_msg.append(construct_coverage_slack_msg(pipeline_url))
 
-    slack_msg = [{
+    slack_msg.append({
         'fallback': title,
         'color': color,
         'title': title,
         'title_link': pipeline_url,
         'fields': content_fields
-    }]
+    })
     return slack_msg
 
 
@@ -225,6 +230,21 @@ def collect_pipeline_data(gitlab_client, project_id, pipeline_id) -> Tuple[str, 
             logging.info(f'pipeline associated with failed job is {job.pipeline.get("web_url")}')
             failed_jobs.append(job)
     return pipeline.web_url, failed_jobs
+
+
+def construct_coverage_slack_msg(pipeline_url):
+    coverage_today = get_coverage(filename=os.path.join(ARTIFACTS_FOLDER_XSOAR, 'coverage_report/coverage-min.json'))
+    yasterday = datetime.now() - timedelta(days=1)
+    coverage_yasterday = get_coverage(date=yasterday)
+    color = 'good' if coverage_today >= coverage_yasterday else 'danger'
+    title = f'Code coverage: {coverage_today}'
+
+    return {
+        'fallback': title,
+        'color': color,
+        'title': title,
+        'title_link': f'{pipeline_url}/artifacts/file/artifacts/coverage_report/html/index.html'
+    }
 
 
 def main():
