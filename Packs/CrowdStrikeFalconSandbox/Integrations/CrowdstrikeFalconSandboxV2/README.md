@@ -1061,7 +1061,7 @@ Submits a file from the investigation to the analysis server.
 | comment | Optional comment text that may be associated with the submission/sample (Note: you can use #tags). | Optional | 
 | custom_cmd_line | Optional command line that should be passed to the analysis file. | Optional | 
 | custom_run_time | Optional runtime duration (in seconds). | Optional | 
-| submit_name | Optional runtime duration (in seconds). | Optional | 
+| submit_name | Optional 'submission name' field that will be used for file type detection and analysis. Ignored unless url contains a file | Optional | 
 | priority | Optional priority value between 1 (lowest) and 10 (highest). By default all samples run with highest priority. Possible values are: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. | Optional | 
 | document_password | Optional document password used to fill in Adobe/Office password prompts. | Optional | 
 | environment_variable | Optional system environment value. The value is provided in the format name=value. | Optional | 
@@ -2683,7 +2683,7 @@ Submits a URL for analysis.
 | comment | Optional comment text that may be associated with the submission/sample (Note: you can use #tags). | Optional | 
 | custom_cmd_line | Optional command line that should be passed to the analysis file. | Optional | 
 | custom_run_time | Optional runtime duration (in seconds). | Optional | 
-| submit_name | Optional runtime duration (in seconds). | Optional | 
+| submit_name | Optional 'submission name' field that will be used for file type detection and analysis. Ignored unless url contains a file | Optional | 
 | priority | Optional priority value between 1 (lowest) and 10 (highest). By default all samples run with highest priority. Possible values are: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. | Optional | 
 | document_password | Optional document password used to fill in Adobe/Office password prompts. | Optional | 
 | environment_variable | Optional system environment value. The value is provided in the format name=value. | Optional | 

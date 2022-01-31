@@ -578,7 +578,8 @@ script:
           isArray: false
           defaultValue: ""
         - name: submit_name
-          description: Optional runtime duration (in seconds)
+          description: Optional 'submission name' field that will be used for file type detection and analysis.
+          Ignored unless url contains a file
           required: false
           isArray: false
           defaultValue: ""
@@ -906,7 +907,8 @@ script:
           isArray: false
           defaultValue: ""
         - name: submit_name
-          description: Optional runtime duration (in seconds)
+          description: Optional 'submission name' field that will be used for file type detection and analysis.
+          Ignored unless url contains a file
           required: false
           isArray: false
           defaultValue: ""
@@ -1902,7 +1904,8 @@ script:
           isArray: false
           defaultValue: ""
         - name: submit_name
-          description: Optional runtime duration (in seconds).
+          description: Optional 'submission name' field that will be used for file type detection and analysis.
+          Ignored unless url contains a file.
           required: false
           isArray: false
           defaultValue: ""
@@ -2230,7 +2233,8 @@ script:
           isArray: false
           defaultValue: ""
         - name: submit_name
-          description: Optional runtime duration (in seconds).
+          description: Optional 'submission name' field that will be used for file type detection and analysis.
+          Ignored unless url contains a file.
           required: false
           isArray: false
           defaultValue: ""
