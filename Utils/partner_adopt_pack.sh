@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Check that an argument was passed
+[ $# -ne 1 ] && { echo "Usage: $0 PACK_NAME"; exit 1; }
+
 echo "Initializing Pack Adoption..."
 
 # Check dependencies exist
@@ -34,12 +37,13 @@ fi
 branch="$(git rev-parse --abbrev-ref HEAD)"
 if [ "$branch" != "master" ] && [ "$branch" != "main" ]; then
   echo "✗ Not on master/main branch.";
-  untracked_files=$(git ls-files --other --directory --exclude-standard | wc -l | tr -d '[:space:]')
-
+  untracked_files=$(git --no-pager  diff --name-only | wc -l | tr -d '[:space:]')
+  
   # Check if there are any untracked files
   if [ "$untracked_files" -gt 0 ]; then
-	echo "✗ Cannot checkout master/main branch since there are $untracked_files untracked files."
-	echo "Please run 'git stash/revert' and rerun."
+	echo "✗ Cannot checkout master/main branch since there are $untracked_files untracked files:"
+	git status | grep -i modified | cut -d ":" -f2
+	echo "Please run 'git stash/revert/reset' and rerun."
 	exit 1
 
   else
@@ -59,3 +63,8 @@ if [ "$branch" != "master" ] && [ "$branch" != "main" ]; then
 else
   echo "✓ On '$branch' branch"
 fi
+
+# Check if pack exists
+pack_name=$1
+dir=$repo_root/$pack_name
+echo "$dir"

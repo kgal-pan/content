@@ -138,7 +138,7 @@ def update_playbook(source_path, destination_path):
 def main(argv):
     if len(argv) < 1:
         print("Please provide <source playbook path>, <optional - destination playbook path>")
-        sys.exit(1)
+        sys.exit(1)a
 
     source_path = argv[0]
     destination_path = ""
