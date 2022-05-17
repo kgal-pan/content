@@ -71,5 +71,6 @@ dir="$repo_root/Packs/$pack_name"
 if [ ! -d "$dir" ] 
 then
     echo "Cannot find Pack name '$pack_name' in directory '$dir'" 
+	git checkout "$branch"
     exit 1
 fi
