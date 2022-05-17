@@ -66,5 +66,10 @@ fi
 
 # Check if pack exists
 pack_name=$1
-dir=$repo_root/$pack_name
-echo "$dir"
+dir="$repo_root/Packs/$pack_name"
+
+if [ ! -d "$dir" ] 
+then
+    echo "Cannot find Pack name '$pack_name' in directory '$dir'" 
+    exit 1
+fi
