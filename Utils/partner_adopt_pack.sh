@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 #######################################
 # Check if we're running supported OS (darwin|linux)
 # Globals:
@@ -67,14 +69,14 @@ get_repo_root(){
 }
 
 #######################################
-# Verify Pack exists
+# Verify Pack path exists and return path
 # Globals:
 #   None
 # Arguments:
 #   pack_name: The name of the Pack from argument
 #   repo_root: The root git repository path
 #######################################
-verify_pack_exists(){
+get_pack_path(){
 	# Check if pack exists
 	pack_name=$1
 	root_repo=$2
@@ -84,6 +86,8 @@ verify_pack_exists(){
 	then
 		echo "✗ Cannot find Pack name '$pack_name' in directory '$dir'" 
 		exit 1
+	else
+		echo "$dir"
 	fi
 }
 
@@ -96,20 +100,33 @@ verify_pack_exists(){
 #   None
 #######################################
 create_adopt_branch(){
-	branch_name="partner-$pack_name-adopt-start"
-	git checkout -q -b "$branch_name"
-	echo "✓ Created new branch for adoption '$branch_name'"
+	git checkout -q -b "$1"
+	echo "✓ Created new branch for adoption '$1'"
 }
 
 
 #######################################
-# Create new branch from master
+# Get branch name
 # Globals:
-#   os: the string representing the operating system
+#   None
+# Arguments:
+#   pack_name
+#######################################
+get_branch(){
+	pack_name=$1
+	branch_name="partner-$pack_name-adopt-start"
+	echo "$branch_name"
+}
+
+
+#######################################
+# Attempt to reset to master/main branch
+# Globals:
+#   None
 # Arguments:
 #   None
 #######################################
-create_branch_from_head(){
+reset_to_master(){
 	# Check that we're on master/main
 	# If on master/main, create new adopt branch
 	# If not, see if there are any untracked files and attempt to checkout master/main if none
@@ -130,22 +147,15 @@ create_branch_from_head(){
 			echo "No untracked changes done, attempting to change to master/main branch..."
 			if git show-ref --quiet refs/heads/master; then
 				echo "Checking out master branch..."
-				# TODO rm comment
-				# git checkout master
+				git checkout master
 			elif git show-ref --quiet refs/heads/main; then
 				echo "Checking out main branch..."
-				# TODO rm comment
-				# git checkout main
+				git checkout main
 			else
 				echo "Could not find references to main/master HEAD. Terminating..."
-				exit 1
-			
-			create_adopt_branch
+				exit 1	
 			fi
 		fi
-		else
-		echo "✓ On '$branch' branch"
-		create_adopt_branch
 	fi
 }
 
@@ -196,15 +206,35 @@ add_msg_to_readme(){
 # 2) Bump version
 # 3) Create release notes and add message there
 # Globals:
-#   dir
-# Arguments:
 #   None
+# Arguments:
+#   pack_path: Path to Pack
 #######################################
 adopt_start() {
+	dir=$1
 	message=$(echo "Note: Support for this Pack will be moved to Partner starting $(get_move_date).")
 	readme="$dir/README.md"
+	pack_name=$(basename "$dir")
 
+	# Add message to README
 	add_msg_to_readme "$readme" "$message"
+	echo "✓ Adoption start message added to README.md"
+
+	# Bump version and create release note file
+	demisto-sdk update-release-notes --input "$dir" --force --update-type "documentation" #&> /dev/null
+	pack_metadata="$dir/pack_metadata.json"
+	release_note=$(git --no-pager  diff --name-only --cached)
+	release_note_name=$(basename "$release_note")
+
+	echo "✓ Pack version bumped in '$pack_metadata'" 
+	echo "✓ Release note created in '$release_note'"
+
+	# Add release note to second line (replacing documentation bullet)
+	awk '{ if (NR == 2) print "- Start of adoption process"; else print $0}' "$release_note" > "/tmp/$release_note_name" && mv -f "/tmp/$release_note_name" "$release_note"
+	echo "✓ Release note updated."
+
+	git add "$readme" "$release_note" "$pack_metadata"
+	git commit -m "$pack_name adoption started"
 
 }
 
@@ -226,10 +256,23 @@ main(){
 	root_repo=$(get_repo_root)
 	echo "✓ Found git repository in '$root_repo'."
 
-	verify_pack_exists "$pack_name" "$root_repo"
+	pack_path=$(get_pack_path "$pack_name" "$root_repo")
 	echo "✓ Pack '$pack_name' exists."
 
-	# create_branch_from_head
+	reset_to_master
+	branch=$(get_branch "$pack_name")
+	create_adopt_branch "$branch"
+	echo "✓ Branch $branch created."
+
+	adopt_start "$pack_path"
+	echo "✓ Adoption start changes complete."
+
+	git push --set-upstream origin "$branch"
+	echo "✓ Branch pushed upstream."
+	user=$(git remote get-url --all origin | cut -d ":" -f2 | cut -d"/" -f1)
+	echo "Visit https://github.com/$user/content/pull/new/$branch and complete Pull Request"
+
+	exit 0
 
 }
 
