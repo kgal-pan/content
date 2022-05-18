@@ -101,7 +101,7 @@ get_pack_path(){
 #######################################
 create_adopt_branch(){
 	git checkout -q -b "$1"
-	echo "✓ Created new branch for adoption '$1'"
+	echo "✓ Created new branch '$1' for adoption."
 }
 
 
@@ -233,8 +233,8 @@ adopt_start() {
 	awk '{ if (NR == 2) print "- Start of adoption process"; else print $0}' "$release_note" > "/tmp/$release_note_name" && mv -f "/tmp/$release_note_name" "$release_note"
 	echo "✓ Release note updated."
 
-	git add "$readme" "$release_note" "$pack_metadata"
-	git commit -m "$pack_name adoption started"
+	git add "$readme" "$release_note" "$pack_metadata" &> /dev/null
+	git commit -m "$pack_name adoption started" &> /dev/null
 
 }
 
@@ -262,7 +262,7 @@ main(){
 	reset_to_master
 	branch=$(get_branch "$pack_name")
 	create_adopt_branch "$branch"
-	echo "✓ Branch $branch created."
+	echo "✓ Branch created."
 
 	adopt_start "$pack_path"
 	echo "✓ Adoption start changes complete."
