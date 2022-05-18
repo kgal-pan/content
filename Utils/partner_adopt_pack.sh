@@ -221,7 +221,7 @@ adopt_start() {
 	echo "✓ Adoption start message added to README.md"
 
 	# Bump version and create release note file
-	demisto-sdk update-release-notes --input "$dir" --force --update-type "documentation" #&> /dev/null
+	demisto-sdk update-release-notes --input "$dir" --force --update-type "documentation" &> /dev/null
 	pack_metadata="$dir/pack_metadata.json"
 	release_note=$(git --no-pager  diff --name-only --cached)
 	release_note_name=$(basename "$release_note")
@@ -267,7 +267,7 @@ main(){
 	adopt_start "$pack_path"
 	echo "✓ Adoption start changes complete."
 
-	git push --set-upstream origin "$branch"
+	git push --set-upstream origin "$branch" &> /dev/null
 	echo "✓ Branch pushed upstream."
 	user=$(git remote get-url --all origin | cut -d ":" -f2 | cut -d"/" -f1)
 	echo "Visit https://github.com/$user/content/pull/new/$branch and complete Pull Request"
