@@ -5,7 +5,7 @@
 source "${0%/*}/partner_adopt_utils.sh"
 
 # Set to terminate script in case of any error
-set -e o pipefail
+set -e -o pipefail
 
 main(){
 	# Check that arguments were passed
