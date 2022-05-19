@@ -40,7 +40,6 @@ main(){
 	echo "✓ Branch created."
 	adopt "$option" "$pack_path" "$branch"
 
-	
 	reset_env "$init_branch" "$init_wd"
 	exit 0
 

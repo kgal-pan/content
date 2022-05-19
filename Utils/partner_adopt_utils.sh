@@ -406,7 +406,7 @@ validate_inputs(){
 # Globals:
 #   None
 # Arguments:
-#   None
+#   $0: Program name
 #######################################
 usage(){
 	echo "Usage: $0 start|complete pack_name"
@@ -423,7 +423,7 @@ usage(){
 #######################################
 reset_env(){
 	
-	git checkout "$1"
+	git checkout "$1" &> /dev/null
 	cd "$2" || "Failed change directories back to '$2', error code $?"; exit 1
 
 }
