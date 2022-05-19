@@ -99,20 +99,21 @@ get_pack_path(){
 #######################################
 create_adopt_branch(){
 	git checkout -q -b "$1"
-	echo "✓ Created new branch '$1' for adoption."
 }
 
 
 #######################################
-# Get branch name
+# Create branch name based on pack
 # Globals:
 #   None
 # Arguments:
 #   $1: Pack name
+#   $2: Option
 #######################################
 get_branch(){
 	pack_name=$1
-	branch_name="partner-$pack_name-adopt-start"
+	opt=$2
+	branch_name="partner-$pack_name-adopt-$opt"
 	echo "$branch_name"
 }
 
@@ -162,13 +163,13 @@ push(){
 # Globals:
 #   None
 # Arguments:
-#   None
+#   $1: Current branch
 #######################################
 reset_to_master(){
 	# Check that we're on master/main
 	# If on master/main, create new adopt branch
 	# If not, see if there are any untracked files and attempt to checkout master/main if none
-	branch="$(git rev-parse --abbrev-ref HEAD)"
+	branch=$1
 	if [ "$branch" != "master" ] && [ "$branch" != "main" ]; then
 		echo "✗ Not on master/main branch.";
 		untracked_files=$(git --no-pager  diff --name-only | wc -l | tr -d '[:space:]')
@@ -410,4 +411,19 @@ validate_inputs(){
 usage(){
 	echo "Usage: $0 start|complete pack_name"
 	exit 1
+}
+
+#######################################
+# Reset environment to before script
+# Globals:
+#   None
+# Arguments:
+#   $1: Branch name
+#   $2: Working directory
+#######################################
+reset_env(){
+	
+	git checkout "$1"
+	cd "$2" || "Failed change directories back to '$2', error code $?"; exit 1
+
 }
