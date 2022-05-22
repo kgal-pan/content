@@ -50,14 +50,13 @@ check_dependencies(){
 			then
 				echo "Install git by visiting https://git-scm.com/download/linux"
 				exit 1
-
 			# If Python was not found on Mac OS
-			elif [ "$d" == "python" ] && [ "$os" == "Mac OS" ]
+			elif [ "$d" == "python3" ] && [ "$os" == "Mac OS" ]
 			then
 				echo "Install Python by visiting https://www.python.org/downloads/macos/"
 				exit 1
 			# If Python was not found on Linux
-			elif [ "$d" == "python" ] && [ "$os" == "Linux" ]
+			elif [ "$d" == "python3" ] && [ "$os" == "Linux" ]
 			then
 				echo "Install Python by visiting https://www.python.org/downloads/source/"
 				exit 1
@@ -67,7 +66,6 @@ check_dependencies(){
 				echo "Installing $d..."
 				install_sdk
 			fi
-
 		else
 			echo "✓ Dependency '$d' found."
 		fi
