@@ -320,6 +320,8 @@ add_msg_to_rn(){
 		message="- Started Adoption process."
 	fi
 
+	echo "$message, $os, $rn"
+
 	if [ "$os" == "Mac OS" ] 
 	then
 		sed -i '' "2s/.*/$message/" "$rn"
