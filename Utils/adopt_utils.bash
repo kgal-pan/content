@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #######################################
 # Check if we're running supported OS (darwin || linux)
 # Globals:
@@ -34,9 +36,11 @@ check_dependencies(){
 	dependencies=$1
 	os=$2
 
+	echo "OS: $os"
+
 	for d in "${dependencies[@]}"; 
 	do
-		if ! command -v "$d" &> /dev/null 
+		if ! command -v "$d" &> /dev/null
 		then
 			echo "✗ $d was not found in the system or in the PATH."
 
