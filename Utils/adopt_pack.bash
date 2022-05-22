@@ -18,13 +18,11 @@ main(){
 	init_wd=$(pwd)
 
 	os=$(detect_os)
-	echo "$os"
 	echo "✓ Detected OS '$os'."
 
 	dependencies=("git" "python3" "demisto-sdk")
 	check_dependencies "$os" "${dependencies[@]}"
 	echo "✓ All dependencies met."
-	echo "$os"
 
 
 	root_repo=$(get_repo_root)

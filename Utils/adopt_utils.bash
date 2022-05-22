@@ -36,11 +36,8 @@ check_dependencies(){
 
 	os=$1
 	shift
-	
-	dependencies=("$@")
-	
 
-	echo "OS: $os, dependencies: ${dependencies[*]}"
+	dependencies=("$@")
 
 	for d in "${dependencies[@]}"; 
 	do
