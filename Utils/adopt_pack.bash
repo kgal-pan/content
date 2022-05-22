@@ -38,6 +38,8 @@ main(){
 	create_adopt_branch "$branch"
 	echo "✓ Branch created."
 
+
+	echo "$option" "$pack_path" "$branch" "$os"
 	adopt "$option" "$pack_path" "$branch" "$os"
 
 	reset_env "$init_branch" "$init_wd"
