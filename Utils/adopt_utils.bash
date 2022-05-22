@@ -44,23 +44,23 @@ check_dependencies(){
 			if [ "$d" == "git" ] && [ "$os" == "Mac OS" ]
 			then
 				echo "Install git by visiting https://git-scm.com/download/mac"
-
+				exit 1
 			# If git not found and running on Linux
 			elif [ "$d" == "git" ] && [ "$os" == "Linux" ]
 			then
 				echo "Install git by visiting https://git-scm.com/download/linux"
-			
+				exit 1
 
 			# If Python was not found on Mac OS
 			elif [ "$d" == "python" ] && [ "$os" == "Mac OS" ]
 			then
 				echo "Install Python by visiting https://www.python.org/downloads/macos/"
-
+				exit 1
 			# If Python was not found on Linux
 			elif [ "$d" == "python" ] && [ "$os" == "Linux" ]
 			then
 				echo "Install Python by visiting https://www.python.org/downloads/source/"
-
+				exit 1
 			# If Demisto SDK was not found, install it
 			elif [ "$d" == "demisto-sdk" ]
 			then
