@@ -28,15 +28,19 @@ detect_os() {
 # Globals:
 #   None
 # Arguments:
-#   $1: array of dependencies
-#   $2: The OS
+#   $1: The OS
+#   $2: array of dependencies
+
 #######################################
 check_dependencies(){
 
+	os=$1
+	shift
+	
 	dependencies=("$@")
-	os=$2
+	
 
-	echo "OS: $os"
+	echo "OS: $os, dependencies: ${dependencies[*]}"
 
 	for d in "${dependencies[@]}"; 
 	do
