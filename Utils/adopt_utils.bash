@@ -33,7 +33,7 @@ detect_os() {
 #######################################
 check_dependencies(){
 
-	dependencies=$1
+	dependencies=("$@")
 	os=$2
 
 	echo "OS: $os"
