@@ -14,7 +14,7 @@ detect_os() {
 	elif [ "$os" == "Linux" ]; then
 		echo "$os"
 	else
-		echo "✗ Unsupported OS. Terminating"
+		echo "✗ Unsupported OS. Only Unix operating systems are supported. Terminating..."
 		exit 1
 	fi
 
