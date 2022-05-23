@@ -366,12 +366,12 @@ get_pack_email(){
 get_author_image(){
 
 	pack_dir="$1"
-	echo -n "Enter a URL to download the author image. If you do not have a URL, just press enter and make sure to add it manually according to https://xsoar.pan.dev/docs/packs/packs-format#author_imagepng"
+	echo -n "Enter a URL to download the author image. If you do not have a URL, just press enter and make sure to add it manually according to https://xsoar.pan.dev/docs/packs/packs-format#author_imagepng: "
 	read -r author_image_url
 	if [ -n "$author_image_url" ] 
 	then
 		echo "Attempting to download image from $author_image_url..."
-		wget "$author_image_url" -O "$pack_dir/Author_image.png" &> /dev/null
+		wget --no-check-certificate --quiet -O "$pack_dir/Author_image.png" "$author_image_url"
 		echo "✓ Author image downloaded to '$pack_dir/Author_image.png'"
 	fi
 }
