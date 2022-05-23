@@ -340,7 +340,7 @@ add_msg_to_rn(){
 # Globals:
 #   None
 # Arguments:
-#   $1: Pack path
+#   $1: Path to pack_metadata
 #######################################
 get_pack_email(){
 
@@ -354,6 +354,26 @@ get_pack_email(){
 
 	echo "$email"
 
+}
+
+#######################################
+# Get Author Image
+# Globals:
+#   None
+# Arguments:
+#   $1: Pack path
+#######################################
+get_author_image(){
+
+	pack_dir="$1"
+	echo -n "Enter a URL to download the author image. If you do not have a URL, just press enter and make sure to add it manually according to https://xsoar.pan.dev/docs/packs/packs-format#author_imagepng"
+	read -r author_image_url
+	if [ -n "$author_image_url" ] 
+	then
+		echo "Attempting to download image from $author_image_url..."
+		wget "$author_image_url" -O "$pack_dir/Author_image.png" &> /dev/null
+		echo "✓ Author image downloaded to '$pack_dir/Author_image.png'"
+	fi
 }
 
 #######################################
@@ -382,7 +402,6 @@ get_pack_version(){
 set_url(){
 
 	pack_metadata="$1"
-	echo "$pack_metadata"
 	echo -n "Enter a URL to your support site: "
 	read -r url
 
@@ -436,6 +455,7 @@ adopt() {
 	else
 		set_url "$pack_metadata"
 		support_email=$(get_pack_email "$pack_metadata")
+		get_author_image "$dir"
 		message="Note: Support for this Pack was moved to Partner starting $(get_today_date). In case of any issues arise, please contact the Partner directly at $support_email."
 	fi
 
