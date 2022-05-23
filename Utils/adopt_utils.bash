@@ -361,7 +361,26 @@ set_pack_email(){
 }
 
 #######################################
-# Set author
+# Set support type in pack metadata
+# Globals:
+#   None
+# Arguments:
+#   $1: Path to pack_metadata
+#   $2: Support type ('xsoar', 'partner')
+#######################################
+set_pack_support_type(){
+
+	pack_metadata="$1"
+	type="$2"
+
+	jq ". | select(.support) .support=\"$type\"" "$pack_metadata" > "${pack_metadata}.bak" && rm "$pack_metadata" && mv "${pack_metadata}.bak" "$pack_metadata" &> /dev/null
+	echo "✓ Support type '$type' set in pack_metadata.json."
+
+}
+
+
+#######################################
+# Set pack author in pack metadata
 # Globals:
 #   None
 # Arguments:
@@ -370,11 +389,12 @@ set_pack_email(){
 set_pack_author(){
 
 	pack_metadata="$1"
-	echo -n "Enter your organization's name: "
-	read -r org_name
+	
+	echo -n "Enter your organization/company's name: "
+	read -r author
 
-	jq ". | select(.author) .author=\"$org_name\"" "$pack_metadata" > "${pack_metadata}.bak" && rm "$pack_metadata" && mv "${pack_metadata}.bak" "$pack_metadata" &> /dev/null
-	echo "✓ Author field set in pack_metadata.json."
+	jq ". | select(.author) .author=\"$author\"" "$pack_metadata" > "${pack_metadata}.bak" && rm "$pack_metadata" && mv "${pack_metadata}.bak" "$pack_metadata" &> /dev/null
+	echo "✓ Author set in pack_metadata.json."
 
 }
 
@@ -415,13 +435,13 @@ get_pack_version(){
 }
 
 #######################################
-# Set URL to pack_metadata
+# Set support URL to pack_metadata
 # Globals:
 #   None
 # Arguments:
 #   $1: Path to pack_metadata
 #######################################
-set_url(){
+set_pack_support_url(){
 
 	pack_metadata="$1"
 	echo -n "Enter a URL to your support site: "
@@ -471,13 +491,16 @@ adopt() {
 	release_note_name=$(basename "$release_note")
 	echo "✓ Release note '$release_note_name' updated."
 
-	# Add message to README
+	# If we're completing adoption, we need to request some additional
+	# paramaters to be set in the Pack metadata.
 	if [[ "$option" == "start" ]]; then
 		message="Note: Support for this Pack will be moved to Partner starting $(get_move_date)."
 	else
+		set_pack_support_type "$pack_metadata" "partner"
 		set_pack_author "$pack_metadata"
-		set_url "$pack_metadata"
+		set_pack_support_url "$pack_metadata"
 		set_pack_email "$pack_metadata"
+		
 		support_email=$(get_pack_email "$pack_metadata")
 		get_author_image "$dir"
 		message="Note: Support for this Pack was moved to Partner starting $(get_today_date). In case of any issues arise, please contact the Partner directly at $support_email."
