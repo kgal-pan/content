@@ -345,7 +345,12 @@ add_msg_to_rn(){
 get_pack_email(){
 
 	pack_metadata="$1"
-	email=$(jq -r '.email' "$pack_metadata")
+	echo "$pack_metadata"
+	echo -n "Enter the email to your support site: "
+	read -r email
+
+	jq ". | select(.email) .email=\"$email\"" "$pack_metadata" > "${pack_metadata}.bak" && rm "$pack_metadata" && mv "${pack_metadata}.bak" "$pack_metadata" &> /dev/null
+	echo "✓ Email field set in pack_metadata.json."
 
 	echo "$email"
 
@@ -364,6 +369,25 @@ get_pack_version(){
 	version=$(jq '.currentVersion' "$pack_metadata")
 
 	echo "$version"
+
+}
+
+#######################################
+# Set URL to pack_metadata
+# Globals:
+#   None
+# Arguments:
+#   $1: Path to pack_metadata
+#######################################
+set_url(){
+
+	pack_metadata="$1"
+	echo "$pack_metadata"
+	echo -n "Enter a URL to your support site: "
+	read -r url
+
+	jq ". | select(.url) .url=\"$url\"" "$pack_metadata" > "${pack_metadata}.bak" && rm "$pack_metadata" && mv "${pack_metadata}.bak" "$pack_metadata" &> /dev/null
+	echo "✓ URL field set in pack_metadata.json."
 
 }
 
@@ -407,10 +431,10 @@ adopt() {
 	echo "✓ Release note '$release_note_name' updated."
 
 	# Add message to README
-	# TODO when completion is selected, need to create an interactive prompt to fill out pack_metadata
 	if [[ "$option" == "start" ]]; then
 		message="Note: Support for this Pack will be moved to Partner starting $(get_move_date)."
 	else
+		set_url "$pack_metadata"
 		support_email=$(get_pack_email "$pack_metadata")
 		message="Note: Support for this Pack was moved to Partner starting $(get_today_date). In case of any issues arise, please contact the Partner directly at $support_email."
 	fi
