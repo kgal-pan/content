@@ -513,11 +513,11 @@ adopt() {
 	commit "$option"
 	echo "✓ Changes committed."
 
-	# pr_url=$(push "$branch")
-	# echo "✓ Branch pushed upstream."
+	pr_url=$(push "$branch")
+	echo "✓ Branch pushed upstream."
 
-	# echo "All done here!"
-	# echo "Please visit $pr_url and fill out the Pull Request details to complete the adoption process"
+	echo "All done here!"
+	echo "Please visit $pr_url and fill out the Pull Request details to complete the adoption process"
 
 }
 
