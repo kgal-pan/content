@@ -175,7 +175,7 @@ get_branch(){
 #######################################
 commit(){
 
-	git add . &> /dev/null
+	git add .
 	git commit -m "$pack_name adoption $1" &> /dev/null
 
 }
