@@ -464,6 +464,7 @@ adopt() {
 		message="Note: Support for this Pack will be moved to Partner starting $(get_move_date)."
 	else
 		set_url "$pack_metadata"
+		set_pack_email "$pack_metadata"
 		support_email=$(get_pack_email "$pack_metadata")
 		get_author_image "$dir"
 		message="Note: Support for this Pack was moved to Partner starting $(get_today_date). In case of any issues arise, please contact the Partner directly at $support_email."
