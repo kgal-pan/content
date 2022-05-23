@@ -399,13 +399,13 @@ set_pack_author(){
 }
 
 #######################################
-# Get Author Image
+# Set Author Image (if provided)
 # Globals:
 #   None
 # Arguments:
 #   $1: Pack path
 #######################################
-get_author_image(){
+set_author_image(){
 
 	pack_dir="$1"
 	echo -n "Enter a URL to download the author image. If you do not have a URL, just press enter and make sure to add it manually according to https://xsoar.pan.dev/docs/packs/packs-format#author_imagepng: "
@@ -502,7 +502,7 @@ adopt() {
 		set_pack_email "$pack_metadata"
 		
 		support_email=$(get_pack_email "$pack_metadata")
-		get_author_image "$dir"
+		set_author_image "$dir"
 		message="Note: Support for this Pack was moved to Partner starting $(get_today_date). In case of any issues arise, please contact the Partner directly at $support_email."
 	fi
 
@@ -512,11 +512,11 @@ adopt() {
 	commit "$option"
 	echo "✓ Changes committed."
 
-	pr_url=$(push "$branch")
-	echo "✓ Branch pushed upstream."
+	# pr_url=$(push "$branch")
+	# echo "✓ Branch pushed upstream."
 
-	echo "All done here!"
-	echo "Please visit $pr_url and fill out the Pull Request details to complete the adoption process"
+	# echo "All done here!"
+	# echo "Please visit $pr_url and fill out the Pull Request details to complete the adoption process"
 
 }
 
