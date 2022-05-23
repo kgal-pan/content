@@ -171,18 +171,12 @@ get_branch(){
 # Globals:
 #   None
 # Arguments:
-#   $1: Path to Pack README
-#   $2: Path to Pack release note
-#   $3: Path to Pack metadata
+#   $1: Option
 #######################################
 commit(){
 
-	readme=$1
-	release_note=$2
-	pack_metadata=$3
-
-	git add "$readme" "$release_note" "$pack_metadata" &> /dev/null
-	git commit -m "$pack_name adoption started" &> /dev/null
+	git add . &> /dev/null
+	git commit -m "$pack_name adoption $1" &> /dev/null
 
 }
 
@@ -473,7 +467,7 @@ adopt() {
 	add_msg_to_readme "$readme" "$message"
 	echo "✓ Adoption $option message added to README.md"
 
-	commit "$readme" "$release_note" "$pack_metadata"
+	commit "$option"
 	echo "✓ Changes committed."
 
 	pr_url=$(push "$branch")
