@@ -323,8 +323,6 @@ add_msg_to_rn(){
 		message="- Started Adoption process."
 	fi
 
-	echo "$message, $os, $rn"
-
 	if [ "$os" == "Mac OS" ] 
 	then
 		sed -i '' "2s/.*/$message/" "$rn"
@@ -343,16 +341,28 @@ add_msg_to_rn(){
 #   $1: Path to pack_metadata
 #######################################
 get_pack_email(){
+	
+	email=$(jq -r '.email' "$1")
+
+	echo "$email"
+
+}
+
+#######################################
+# Set Pack email
+# Globals:
+#   None
+# Arguments:
+#   $1: Path to pack_metadata
+#######################################
+set_pack_email(){
 
 	pack_metadata="$1"
-	echo "$pack_metadata"
 	echo -n "Enter the email to your support site: "
 	read -r email
 
 	jq ". | select(.email) .email=\"$email\"" "$pack_metadata" > "${pack_metadata}.bak" && rm "$pack_metadata" && mv "${pack_metadata}.bak" "$pack_metadata" &> /dev/null
 	echo "✓ Email field set in pack_metadata.json."
-
-	echo "$email"
 
 }
 
