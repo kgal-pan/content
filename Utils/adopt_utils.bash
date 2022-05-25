@@ -249,15 +249,15 @@ reset_to_master(){
 			echo "Please run 'git stash/revert/reset' and rerun."
 			exit 1
 		else
-			echo "No untracked changes done, attempting to checkout to master/main branch..."
+			printf "\t- No untracked changes done, attempting to checkout to master/main branch...\n"
 			if git show-ref --quiet refs/heads/master; then
-				echo "Checking out master branch..."
+				printf "\t- Checking out master branch...\n"
 				git checkout master
 			elif git show-ref --quiet refs/heads/main; then
-				echo "Checking out main branch..."
+				printf "\t- Checking out main branch...\n"
 				git checkout main
 			else
-				echo "Could not find references to main/master HEAD. Terminating..."
+				printf "\t-Could not find references to main/master HEAD. Terminating...\n"
 				exit 1	
 			fi
 		fi
@@ -549,7 +549,7 @@ adopt() {
 	pr_url=$(push "$branch")
 	echo "✓ Branch pushed upstream."
 
-	printf "\nAll done here!"
+	printf "\nAll done here!\n\n"
 	echo "Please visit ====> $pr_url <==== and fill out the Pull Request details to complete the adoption process"
 
 }
