@@ -177,12 +177,13 @@ check_branch(){
 	
 	if git show-ref --quiet "refs/heads/$1"
 	then
-		echo "Branch '$1' exists, will be deleted and recreated..."
+		printf "\t- Branch '%s' exists, will be deleted and recreated...\n" "$1"
 		if git branch -D --quiet "$1"
 		then
-			echo "✓ Branch '$1' deleted"
+			printf "\t- ✓ Branch '%s' deleted\n" "$1"
 		else
-			echo "✗ Error deleting branch '$1'"
+			printf "\t- ✗ Error deleting branch '%s'. Terminating..." "$1"
+			exit 1
 		fi
 		
 	else
@@ -252,10 +253,10 @@ reset_to_master(){
 			printf "\t- No untracked changes done, attempting to checkout to master/main branch...\n"
 			if git show-ref --quiet refs/heads/master; then
 				printf "\t- Checking out master branch...\n"
-				git checkout master
+				git checkout --quiet master
 			elif git show-ref --quiet refs/heads/main; then
 				printf "\t- Checking out main branch...\n"
-				git checkout main
+				git checkout --quiet main
 			else
 				printf "\t-Could not find references to main/master HEAD. Terminating...\n"
 				exit 1	
