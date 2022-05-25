@@ -146,7 +146,7 @@ get_pack_path(){
 #   None
 #######################################
 create_adopt_branch(){
-	git checkout -q -b "$1" &> /dev/null
+	git checkout -b "$1"
 }
 
 
@@ -551,7 +551,7 @@ adopt() {
 	pr_url=$(push "$branch")
 	echo "✓ Branch pushed upstream."
 
-	echo "All done here!"
+	printf "\nAll done here!"
 	echo "Please visit ====> $pr_url <==== and fill out the Pull Request details to complete the adoption process"
 
 }
