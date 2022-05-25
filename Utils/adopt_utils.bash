@@ -202,9 +202,8 @@ check_branch(){
 #######################################
 commit(){
 
-	git add . 
-	git --no-pager diff --cached --name-only --diff-filter=A
-	git commit -m "$pack_name adoption $1"
+	git --quiet add .
+	git --quiet commit -m "$pack_name adoption $1"
 
 }
 
