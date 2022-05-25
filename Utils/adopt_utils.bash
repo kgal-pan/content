@@ -415,7 +415,16 @@ set_author_image(){
 	then
 		echo "Attempting to download image from $author_image_url..."
 		wget --no-check-certificate --quiet -O "$pack_dir/Author_image.png" "$author_image_url"
-		echo "✓ Author image downloaded to '$pack_dir/Author_image.png'"
+		exit_code=$?
+
+		if [ $exit_code -eq 4 ]
+		then
+			rm "$pack_dir/Author_image.png"
+			echo "✗ Author image download failed. Check that '$author_image_url' is a valid URL."
+			echo "Make sure to manually add it according to https://xsoar.pan.dev/docs/packs/packs-format#author_imagepng"
+		else
+			echo "✓ Author image downloaded to '$pack_dir/Author_image.png'"
+		fi
 	fi
 }
 
@@ -540,7 +549,7 @@ validate_inputs(){
 		# Verify options
 		if [[ "$option" != "start" ]] && [[ "$option" != "complete" ]];
 		then
-			echo "Expecting either 'start' or 'complete' as input, received '$option'"
+			echo "ERROR: Expecting either 'start' or 'complete' as input, received '$option'"
 			usage
 		fi
 	fi
@@ -555,7 +564,7 @@ validate_inputs(){
 #   $0: Program name
 #######################################
 usage(){
-	echo "Usage: $0 start|complete pack_name"
+	echo "USAGE: $0 start|complete pack_name"
 	exit 1
 }
 

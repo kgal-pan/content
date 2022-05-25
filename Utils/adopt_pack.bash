@@ -4,9 +4,7 @@
 # shellcheck disable=SC1091
 source "${0%/*}/adopt_utils.bash"
 
-# Set to terminate script in case of any error
-# set -e -o pipefail
-
+# Set to terminate script and retrieve original env in case of any error
 init_wd=$(pwd)
 init_branch="$(git rev-parse --abbrev-ref HEAD)"
 trap '{ reset_env $init_branch $init_wd; exit 1; }' SIGHUP SIGINT SIGQUIT SIGILL
