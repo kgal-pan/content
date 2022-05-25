@@ -146,7 +146,7 @@ get_pack_path(){
 #   None
 #######################################
 create_adopt_branch(){
-	git checkout -b "$1"
+	git checkout -q -b "$1"
 }
 
 
