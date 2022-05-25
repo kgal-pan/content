@@ -188,8 +188,6 @@ check_branch(){
 	else
 		echo "✓ Branch '$1' doesn't exist"
 	fi
-
-	echo "$branch_name"
 }
 
 
