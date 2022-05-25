@@ -34,7 +34,11 @@ main(){
 
 	reset_to_master "$init_branch"
 
+	# Generate branch name
+	# Check if branch exists and delete if it does
+	# Create new branch
 	branch=$(get_branch "$pack_name" "$option")
+	check_branch "$branch"
 	create_adopt_branch "$branch"
 	echo "✓ Branch created."
 

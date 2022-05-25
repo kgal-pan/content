@@ -167,6 +167,27 @@ get_branch(){
 
 
 #######################################
+# Check if branch exists and delete if it does
+# Globals:
+#   None
+# Arguments:
+#   $1: Branch name
+#######################################
+check_branch(){
+	
+	if git show-ref --quiet "refs/heads/$1"
+	then
+		echo "Branch '$1' exists, deleting...".
+		git branch -D "$1"
+	else
+		echo "✓ Branch '$1' doesn't exist"
+	fi
+
+	echo "$branch_name"
+}
+
+
+#######################################
 # Add and Commit changes
 # Globals:
 #   None
