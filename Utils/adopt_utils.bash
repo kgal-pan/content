@@ -202,8 +202,8 @@ check_branch(){
 #######################################
 commit(){
 
-	git --quiet add .
-	git --quiet commit -m "$pack_name adoption $1"
+	git add .
+	git commit -m "$pack_name adoption $1" -q
 
 }
 
