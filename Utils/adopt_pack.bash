@@ -9,7 +9,7 @@ source "${0%/*}/adopt_utils.bash"
 
 init_wd=$(pwd)
 init_branch="$(git rev-parse --abbrev-ref HEAD)"
-trap '{ reset_env $init_branch $init_wd; exit 1; }' SIGINT SIGTERM ERR EXIT SIGILL
+trap '{ reset_env $init_branch $init_wd; exit 1; }' SIGHUP SIGINT SIGQUIT SIGILL
 
 main(){
 	# Check that arguments were passed
