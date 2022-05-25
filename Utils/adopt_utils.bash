@@ -178,7 +178,13 @@ check_branch(){
 	if git show-ref --quiet "refs/heads/$1"
 	then
 		echo "Branch '$1' exists, deleting...".
-		git branch -D "$1"
+		if git branch -D --quiet "$1"
+		then
+			echo "Branch '$1' deleted".
+		else
+			echo "✗ Error deleting branch '$1'"
+		fi
+		
 	else
 		echo "✓ Branch '$1' doesn't exist"
 	fi
@@ -570,7 +576,7 @@ validate_inputs(){
 		# Verify options
 		if [[ "$option" != "start" ]] && [[ "$option" != "complete" ]];
 		then
-			echo "ERROR: Expecting either 'start' or 'complete' as input, received '$option'"
+			echo "Error: Expecting either 'start' or 'complete' as input, received '$option'"
 			usage
 		fi
 	fi
@@ -585,7 +591,7 @@ validate_inputs(){
 #   $0: Program name
 #######################################
 usage(){
-	echo "USAGE: $0 start|complete pack_name"
+	echo "Usage: $0 start|complete pack_name"
 	exit 1
 }
 
