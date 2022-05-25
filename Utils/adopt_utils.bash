@@ -176,7 +176,7 @@ get_branch(){
 commit(){
 
 	git add . 
-	git diff --cached --name-only --diff-filter=A
+	git --no-pager diff --cached --name-only --diff-filter=A
 	git commit -m "$pack_name adoption $1"
 
 }
