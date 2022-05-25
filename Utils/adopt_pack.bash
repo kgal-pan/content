@@ -5,7 +5,11 @@
 source "${0%/*}/adopt_utils.bash"
 
 # Set to terminate script in case of any error
-set -e -o pipefail
+# set -e -o pipefail
+
+init_wd=$(pwd)
+init_branch="$(git rev-parse --abbrev-ref HEAD)"
+trap '{ reset_env $init_branch $init_wd; exit 1; }' SIGINT SIGTERM ERR EXIT SIGILL
 
 main(){
 	# Check that arguments were passed
@@ -15,7 +19,7 @@ main(){
 	pack_name=$2
 
 	echo "Initializing Pack Adoption..."
-	init_wd=$(pwd)
+
 
 	os=$(detect_os)
 	echo "✓ Detected OS '$os'."
@@ -30,7 +34,6 @@ main(){
 	pack_path=$(get_pack_path "$pack_name" "$root_repo")
 	echo "✓ Pack '$pack_name' exists."
 
-	init_branch="$(git rev-parse --abbrev-ref HEAD)"
 	reset_to_master "$init_branch"
 
 	branch=$(get_branch "$pack_name" "$option")
