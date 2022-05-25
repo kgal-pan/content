@@ -146,7 +146,7 @@ get_pack_path(){
 #   None
 #######################################
 create_adopt_branch(){
-	git checkout -q -b "$1"
+	git checkout -q -b "$1" &> /dev/null
 }
 
 
@@ -177,10 +177,10 @@ check_branch(){
 	
 	if git show-ref --quiet "refs/heads/$1"
 	then
-		echo "Branch '$1' exists, deleting...".
+		echo "Branch '$1' exists, will be deleted and recreated..."
 		if git branch -D --quiet "$1"
 		then
-			echo "Branch '$1' deleted".
+			echo "Branch '$1' deleted"
 		else
 			echo "✗ Error deleting branch '$1'"
 		fi

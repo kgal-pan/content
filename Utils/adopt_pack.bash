@@ -40,7 +40,7 @@ main(){
 	branch=$(get_branch "$pack_name" "$option")
 	check_branch "$branch"
 	create_adopt_branch "$branch"
-	echo "✓ Branch created."
+	echo "✓ Branch '$branch' created."
 
 	adopt "$option" "$pack_path" "$branch" "$os"
 
