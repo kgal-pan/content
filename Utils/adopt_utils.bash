@@ -315,7 +315,8 @@ add_msg_to_readme(){
 	readme=$1
 	message=$2
 
-	echo "Adding message to README..."
+	echo "Adding message '$message' to README '$readme'..."
+	echo "OS: $3"
 
 	if [ "$3" == "Mac OS" ] 
 	then
