@@ -315,8 +315,6 @@ add_msg_to_readme(){
 	message=$2
 	os=$(detect_os)
 
-	echo "Adding message '$message' to README '$readme'..."
-
 	if [ "$os" == "Mac OS" ] 
 	then
 		sed -i '' "1s/^/$message\n\n/" "$readme"
