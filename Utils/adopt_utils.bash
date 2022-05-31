@@ -308,19 +308,18 @@ get_today_date(){
 # Arguments:
 #   $1: the path to the Pack README.md
 #   $2: the message to write to the top of the README.md
-#   $3: OS
 #######################################
 add_msg_to_readme(){
 
 	readme=$1
 	message=$2
+	os=$(detect_os)
 
 	echo "Adding message '$message' to README '$readme'..."
-	echo "OS: $3"
 
-	if [ "$3" == "Mac OS" ] 
+	if [ "$os" == "Mac OS" ] 
 	then
-		sed -i '' "1s/^/$message\n\n/g" "$readme"
+		sed -i '' "1s/^/$message\n\n/" "$readme"
 	else
 		sed -i "1s/^/$message\n\n/" "$readme"
 	fi
@@ -545,7 +544,7 @@ adopt() {
 		message="Note: Support for this Pack was moved to Partner starting $(get_today_date). In case of any issues arise, please contact the Partner directly at $support_email."
 	fi
 
-	add_msg_to_readme "$readme" "$message" "$os"
+	add_msg_to_readme "$readme" "$message"
 	echo "✓ Adoption $option message added to README.md"
 
 	commit "$option"
