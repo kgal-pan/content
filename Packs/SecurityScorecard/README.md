@@ -1,3 +1,5 @@
+Note: Support for this Pack will be moved to Partner starting August 30, 2022.
+
 The SecurityScorecard Ratings Content Pack is an integrated offering that provides an alerting system triggered by configurable conditions such as changes in organization grades and vulnerabilities found.
 
 This Content Pack enables security teams to create an alert in SecurityScorecard with particular conditions, which allows them to delete, update and interact with the alerts. A Cortex XSOAR Incident is created when an alert is triggered in SecurityScorecard. Alerts can be retrieved for factor grade drops, overall score drops, new vulnerabilities found, new issues, and CVEs detected.
