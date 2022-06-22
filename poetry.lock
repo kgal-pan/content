@@ -180,14 +180,14 @@ six = "*"
 
 [[package]]
 name = "boto3"
-version = "1.24.8"
+version = "1.24.15"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.8,<1.28.0"
+botocore = ">=1.27.15,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -196,7 +196,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.8"
+version = "1.27.15"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -2196,7 +2196,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "b4c18635879236592be0e874ede58ea167093189f66fdcfeeec8151e92caccd5"
+content-hash = "9e1ec93b6f54221dd4e60981ad231bd47f319f45a0c41fd37f10ccf7fe0fae36"
 
 [metadata.files]
 aiohttp = [
@@ -2350,12 +2350,12 @@ blessings = [
     {file = "blessings-1.7.tar.gz", hash = "sha256:98e5854d805f50a5b58ac2333411b0482516a8210f23f43308baeb58d77c157d"},
 ]
 boto3 = [
-    {file = "boto3-1.24.8-py3-none-any.whl", hash = "sha256:28ab0947c49a6fb2409004d4a10b2828aec231cb95ca1d800cb1411e191cc201"},
-    {file = "boto3-1.24.8.tar.gz", hash = "sha256:833e67edfb73f2cc22ff27a1c33728686dc90a9e81ba2551f9462ea2d1b04f41"},
+    {file = "boto3-1.24.15-py3-none-any.whl", hash = "sha256:42485c7c53eda9e49106d49a6bc222062428969dd27164fe346b1433d6de74ee"},
+    {file = "boto3-1.24.15.tar.gz", hash = "sha256:c13ef01bd6c8872e68141060bd046a3baa979e96524391efc880dfde4ed64e11"},
 ]
 botocore = [
-    {file = "botocore-1.27.8-py3-none-any.whl", hash = "sha256:ad92702930d6cb7b587fc2f619672feb74d5218f8de387a28c2905820db79027"},
-    {file = "botocore-1.27.8.tar.gz", hash = "sha256:db6667b8dfd175d16187653942cd91dd1f0cf36adc0ea9d7a0805ba4d2a3321f"},
+    {file = "botocore-1.27.15-py3-none-any.whl", hash = "sha256:aaa019265dfea61c5355a207b14283161002d4d94e0eb85194dd04f3bdba48be"},
+    {file = "botocore-1.27.15.tar.gz", hash = "sha256:3799d5c8642b29b347418eb26d42e541d0dc24faa5e62bc8b3812722ab2bf139"},
 ]
 bracex = [
     {file = "bracex-2.3.post1-py3-none-any.whl", hash = "sha256:351b7f20d56fb9ea91f9b9e9e7664db466eb234188c175fd943f8f755c807e73"},
