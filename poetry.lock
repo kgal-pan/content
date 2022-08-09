@@ -180,14 +180,14 @@ six = "*"
 
 [[package]]
 name = "boto3"
-version = "1.24.8"
+version = "1.24.47"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.8,<1.28.0"
+botocore = ">=1.27.47,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -196,7 +196,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.8"
+version = "1.27.47"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -377,9 +377,9 @@ regex = "<2019.02.19 || >2019.02.19,<2021.8.27 || >2021.8.27,<2022.3.15"
 tzlocal = "*"
 
 [package.extras]
-calendars = ["convertdate", "hijri-converter", "convertdate"]
-fasttext = ["fasttext"]
 langdetect = ["langdetect"]
+fasttext = ["fasttext"]
+calendars = ["convertdate", "hijri-converter", "convertdate"]
 
 [[package]]
 name = "db-dtypes"
@@ -527,10 +527,10 @@ optional = false
 python-versions = "*"
 
 [package.extras]
-all = ["Sphinx (>=3)", "sphinx-rtd-theme (>=0.2)", "check-manifest (>=0.42)", "mock (>=1.3.0)", "pytest-cov (>=2.10.1)", "pytest-isort (>=1.2.0)", "sphinx (>=3)", "tox (>=3.7.0)", "numpy (>=1.13.0)", "numpy (>=1.15.0)", "numpy (>=1.18.0)", "pytest (==5.4.3)", "pytest-pycodestyle (>=2)", "pytest-pydocstyle (>=2)", "pytest (>=6)", "pytest-pycodestyle (>=2.2.0)", "pytest-pydocstyle (>=2.2.0)", "numpy (>=1.20.0)"]
-docs = ["Sphinx (>=3)", "sphinx-rtd-theme (>=0.2)"]
-numpy = ["numpy (>=1.13.0)", "numpy (>=1.15.0)", "numpy (>=1.18.0)", "numpy (>=1.20.0)"]
-tests = ["check-manifest (>=0.42)", "mock (>=1.3.0)", "pytest-cov (>=2.10.1)", "pytest-isort (>=1.2.0)", "sphinx (>=3)", "tox (>=3.7.0)", "pytest (==5.4.3)", "pytest-pycodestyle (>=2)", "pytest-pydocstyle (>=2)", "pytest (>=6)", "pytest-pycodestyle (>=2.2.0)", "pytest-pydocstyle (>=2.2.0)"]
+tests = ["pytest-pydocstyle (>=2.2.0)", "pytest-pycodestyle (>=2.2.0)", "pytest (>=6)", "pytest-pydocstyle (>=2)", "pytest-pycodestyle (>=2)", "pytest (==5.4.3)", "tox (>=3.7.0)", "sphinx (>=3)", "pytest-isort (>=1.2.0)", "pytest-cov (>=2.10.1)", "mock (>=1.3.0)", "check-manifest (>=0.42)"]
+numpy = ["numpy (>=1.20.0)", "numpy (>=1.18.0)", "numpy (>=1.15.0)", "numpy (>=1.13.0)"]
+docs = ["sphinx-rtd-theme (>=0.2)", "Sphinx (>=3)"]
+all = ["numpy (>=1.20.0)", "pytest-pydocstyle (>=2.2.0)", "pytest-pycodestyle (>=2.2.0)", "pytest (>=6)", "pytest-pydocstyle (>=2)", "pytest-pycodestyle (>=2)", "pytest (==5.4.3)", "numpy (>=1.18.0)", "numpy (>=1.15.0)", "numpy (>=1.13.0)", "tox (>=3.7.0)", "sphinx (>=3)", "pytest-isort (>=1.2.0)", "pytest-cov (>=2.10.1)", "mock (>=1.3.0)", "check-manifest (>=0.42)", "sphinx-rtd-theme (>=0.2)", "Sphinx (>=3)"]
 
 [[package]]
 name = "dictor"
@@ -1258,8 +1258,8 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
-dev = ["pre-commit", "tox"]
-testing = ["pytest", "pytest-benchmark"]
+testing = ["pytest-benchmark", "pytest"]
+dev = ["tox", "pre-commit"]
 
 [[package]]
 name = "prettytable"
@@ -1546,7 +1546,7 @@ docutils = "*"
 lockfile = ">=0.10"
 
 [package.extras]
-test = ["coverage", "docutils", "testscenarios (>=0.4)", "testtools"]
+test = ["testtools", "testscenarios (>=0.4)", "docutils", "coverage"]
 
 [[package]]
 name = "python-dateutil"
@@ -2196,7 +2196,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "b4c18635879236592be0e874ede58ea167093189f66fdcfeeec8151e92caccd5"
+content-hash = "6f2c8845d2cac1f1f26408dfd1fb07c189d4f09859892d54fbd05f4888a11dae"
 
 [metadata.files]
 aiohttp = [
@@ -2350,12 +2350,12 @@ blessings = [
     {file = "blessings-1.7.tar.gz", hash = "sha256:98e5854d805f50a5b58ac2333411b0482516a8210f23f43308baeb58d77c157d"},
 ]
 boto3 = [
-    {file = "boto3-1.24.8-py3-none-any.whl", hash = "sha256:28ab0947c49a6fb2409004d4a10b2828aec231cb95ca1d800cb1411e191cc201"},
-    {file = "boto3-1.24.8.tar.gz", hash = "sha256:833e67edfb73f2cc22ff27a1c33728686dc90a9e81ba2551f9462ea2d1b04f41"},
+    {file = "boto3-1.24.47-py3-none-any.whl", hash = "sha256:8fa1e0ce6e95a2b7da1d1a9992aee7b05c5478538ea9052e2753999fc46f2f97"},
+    {file = "boto3-1.24.47.tar.gz", hash = "sha256:02b30776fd1b6c0fdf2d72d1365e5adcc6f0baa6540a450946b1a02db3a5ace6"},
 ]
 botocore = [
-    {file = "botocore-1.27.8-py3-none-any.whl", hash = "sha256:ad92702930d6cb7b587fc2f619672feb74d5218f8de387a28c2905820db79027"},
-    {file = "botocore-1.27.8.tar.gz", hash = "sha256:db6667b8dfd175d16187653942cd91dd1f0cf36adc0ea9d7a0805ba4d2a3321f"},
+    {file = "botocore-1.27.47-py3-none-any.whl", hash = "sha256:262d7b10ca2194b9ba63fd972185729e3ee38f99faed518d62580f93af900ad0"},
+    {file = "botocore-1.27.47.tar.gz", hash = "sha256:160a3fa8e3062a48299a1b44ef2ec81f9a58cd3edd0da58808e5c2cc8dd9257f"},
 ]
 bracex = [
     {file = "bracex-2.3.post1-py3-none-any.whl", hash = "sha256:351b7f20d56fb9ea91f9b9e9e7664db466eb234188c175fd943f8f755c807e73"},
