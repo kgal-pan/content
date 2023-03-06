@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          pip install demisto-sdk
+          pip install demisto-sdk blessings github 
 
       - name: Update External PR
         env:
