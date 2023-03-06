@@ -19,8 +19,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          pip install pipenv
-          pipenv install demisto-sdk
+          pip install demisto-sdk
 
       - name: Update External PR
         env:
@@ -30,5 +29,5 @@ jobs:
           echo "Updating External PR ${{ github.event.pull_request.html_url }}"
           cd Utils/github_workflow_scripts
 
-          pipenv run ./handle_external_pr.py
+           ./handle_external_pr.py
           echo "Finished Handling External PR"
