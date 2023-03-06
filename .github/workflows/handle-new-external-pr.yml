@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          pip install demisto-sdk blessings github 
+          pip3 install demisto-sdk blessings github
 
       - name: Update External PR
         env:
@@ -29,5 +29,5 @@ jobs:
           echo "Updating External PR ${{ github.event.pull_request.html_url }}"
           cd Utils/github_workflow_scripts
 
-          python handle_external_pr.py
+          python3 handle_external_pr.py
           echo "Finished Handling External PR"
