@@ -20,4 +20,5 @@ echo "PYTHONPATH=""$path"":$PYTHONPATH" >> .env
 echo "MYPYPATH=""$path"":$MYPYPATH" >> .env
 
 echo "Setting up content dependencies"
-.hooks/bootstrap
+poetry install
+npm install
