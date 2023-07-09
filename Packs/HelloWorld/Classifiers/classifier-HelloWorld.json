@@ -2,7 +2,7 @@
     "id": "HelloWorld",
     "name": "Hello World - Classification",
     "type": "classification",
-    "description": "Classifies Hello World alerts.",
+    "description": "Classifies Hello World alerts. Test",
     "fromVersion": "6.0.0",
     "defaultIncidentType": "",
     "keyTypeMap": {
