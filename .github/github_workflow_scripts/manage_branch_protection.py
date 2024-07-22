@@ -77,18 +77,27 @@ class GitHubGraphQLRateLimit:
         """
         return self.remaining <= 5
 
-    def parse(self, headers: dict[str, str]):
+    def _is_init(self) -> bool:
+        return self.limit != 0
+
+    def set_from_headers(self, headers: dict[str, str]):
         self.limit = int(headers.get(GitHubGraphQLRateLimit.HEADER_LIMIT))
         self.remaining = int(headers.get(GitHubGraphQLRateLimit.HEADER_REMAINING))
         self.reset = datetime.fromtimestamp(int(headers.get(GitHubGraphQLRateLimit.HEADER_RESET)), timezone.utc)
         self.used = int(headers.get(GitHubGraphQLRateLimit.HEADER_USED))
+
+    def set_from_data(self, data: dict[str, Any]):
+        self.limit = data.get("data").get("rateLimit").get("limit")
+        self.remaining = data.get("data").get("rateLimit").get("remaining")
+        self.reset = datetime.strptime(data.get("data").get("rateLimit").get("resetAt"), "%Y-%m-%dT%H:%M:%SZ")
+        self.used = data.get("data").get("rateLimit").get("used")
 
     def handle(self) -> None:
         """
         Handles the rate limiting.
         """
 
-        if self._exceeded():
+        if self._is_init() and self._exceeded():
             logger.error(f"The GitHub GraphQL API request rate limit ({self.limit}) has been exceeded. It resets at {self.reset}.")
             logger.info("Terminating...")
             sys.exit(0)
@@ -131,10 +140,23 @@ class GitHubBranchProtectionRulesManager:
         }
     }"""
 
+    GET_PRIMARY_RATE_LIMIT_QUERY_TEMPLATE = """query {
+        viewer {
+            login
+        }
+        rateLimit {
+            limit
+            remaining
+            used
+            resetAt
+        }
+    }"""
+
     def __init__(self, gh: github.Requester.Requester, repo: str = None) -> None:
         self.gh_client = gh
         self.owner, self.repo_name = self._get_repo_name_and_owner(repo)
         self.rate_limit = GitHubGraphQLRateLimit()
+        self._init_rate_limit()
         self.existing_rules: list[BranchProtectionRule] = self.get_branch_protection_rules()
         self.deleted: list[BranchProtectionRule] = []
 
@@ -194,7 +216,7 @@ class GitHubBranchProtectionRulesManager:
         """
 
         result: list[BranchProtectionRule] = []
-        data = self.get_rules_request()
+        data = self.send_get_rules_request()
 
         result.extend(self._convert_dict_to_bpr(data))
 
@@ -239,6 +261,13 @@ class GitHubBranchProtectionRulesManager:
                 logger.info(f"Rule {rule} was deleted successfully.")
                 self.deleted.append(rule)
 
+    def _init_rate_limit(self):
+        """
+        Initialize the rate limit attribute.
+        """
+
+        self.send_get_rate_limit_request()
+
     def _convert_dict_to_bpr(self, response: dict[str, Any]) -> list[BranchProtectionRule]:
 
         """
@@ -282,9 +311,6 @@ class GitHubBranchProtectionRulesManager:
         we exit 1.
         """
 
-        if self.rate_limit.limit != 0 and self.rate_limit._exceeded():
-            
-
         logger.debug("Sending GraphQL request...")
         logger.debug(f"{query}")
         logger.debug(f"{variables}")
@@ -296,7 +322,7 @@ class GitHubBranchProtectionRulesManager:
             )
 
             logger.debug(f"Response data: {data}")
-            self.rate_limit.parse(headers)
+            self.rate_limit.set_from_headers(headers)
             self.rate_limit.handle()
 
             return data
@@ -322,7 +348,7 @@ class GitHubBranchProtectionRulesManager:
             variables=variables
         )
 
-    def get_rules_request(self) -> dict[str, Any]:
+    def send_get_rules_request(self) -> dict[str, Any]:
         """
         Send a request to GitHub GraphQL API to get all
         branch protection rules.
@@ -337,6 +363,14 @@ class GitHubBranchProtectionRulesManager:
             self.GET_BRANCH_PROTECTION_GRAPHQL_QUERY_TEMPLATE,
             variables=variables
         )
+
+    def send_get_rate_limit_request(self) -> dict[str, Any]:
+        """
+        Send a request to GitHub GraphQL API to get
+        the current rate limit information.
+        """
+
+        return self.send_request(self.GET_PRIMARY_RATE_LIMIT_QUERY_TEMPLATE, variables={})
 
     def write_deleted_summary_to_file(self) -> None:
         """
