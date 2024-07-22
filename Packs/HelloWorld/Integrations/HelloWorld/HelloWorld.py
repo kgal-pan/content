@@ -23,7 +23,6 @@ a number of parameters, such as severity. It
 can also return a single alert by ID. This is used to create new alerts in
 XSOAR by using the ``fetch-incidents`` command, which is by default invoked
 every minute.
-
 - Reputation (ip): this endpoint return a WHOIS lookup of the ip given as well as a reputation score
 (from 0 to 100) that is used to determine whether the entity is malicious. This
 endpoint is called by XSOAR reputation command ``ip`` that
