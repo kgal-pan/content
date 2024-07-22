@@ -16,7 +16,6 @@ https://docs.google.com/document/d/1wETtBEKg37PHNU8tYeB56M1LE314ux086z3HFeF_cX0
 
 HelloWorld API
 --------------
-
 The HelloWorld API is a simple API that shows a realistic use case for an XSOAR
 integration.
 
