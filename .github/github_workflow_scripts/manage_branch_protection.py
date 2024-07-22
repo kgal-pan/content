@@ -41,6 +41,7 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger()
 
 
+@dataclass
 class GitHubGraphQLRateLimit:
 
     # GitHub GraphQL API rate limit
@@ -48,34 +49,52 @@ class GitHubGraphQLRateLimit:
     HEADER_REMAINING = "x-ratelimit-remaining"  # e.g. '4997'
     HEADER_RESET = "x-ratelimit-reset"  # e.g. '1721130684'
     HEADER_USED = "x-ratelimit-used"  # e.g. '3'
-    HEADERS = [
-        HEADER_LIMIT,
-        HEADER_REMAINING,
-        HEADER_RESET,
-        HEADER_USED
-    ]
 
     def __init__(
         self,
-        limit: str,
-        remaining: str,
-        reset: str,
-        used: str
-    ) -> None:
-        self.limit = int(limit)
-        self.remaining = int(remaining)
-        self.reset = datetime.fromtimestamp(int(reset), timezone.utc)
-        self.used = int(used)
+        limit: int = 0,
+        remaining: int = 0,
+        reset: datetime = datetime.now(tz=timezone.utc),
+        used: int = 0
+    ):
+        self.limit = limit
+        self.remaining = remaining
+        self.reset = reset
+        self.used = used
 
-    def exceeded(self) -> bool:
+    def _exceeded(self) -> bool:
         """
         Whether the rate limit was exceeded.
 
         Returns:
         - True` if rate limit was exceeded, `False` otherwise.
         """
-
         return self.remaining == 0
+
+    def _is_low(self) -> bool:
+        """
+        Whether we're low in remaining requests.
+        """
+        return self.remaining <= 5
+
+    def parse(self, headers: dict[str, str]):
+        self.limit = int(headers.get(GitHubGraphQLRateLimit.HEADER_LIMIT))
+        self.remaining = int(headers.get(GitHubGraphQLRateLimit.HEADER_REMAINING))
+        self.reset = datetime.fromtimestamp(int(headers.get(GitHubGraphQLRateLimit.HEADER_RESET)), timezone.utc)
+        self.used = int(headers.get(GitHubGraphQLRateLimit.HEADER_USED))
+
+    def handle(self) -> None:
+        """
+        Handles the rate limiting.
+        """
+
+        if self._exceeded():
+            logger.error(f"The GitHub GraphQL API request rate limit ({self.limit}) has been exceeded. It resets at {self.reset}.")
+            logger.info("Terminating...")
+            sys.exit(0)
+
+        elif self._is_low():
+            logger.warning(f"There are {self.remaining} remaining GitHub GraphQL API requests. It resets at {self.reset}.")
 
 
 @dataclass
@@ -112,9 +131,10 @@ class GitHubBranchProtectionRulesManager:
         }
     }"""
 
-    def __init__(self, gh: Github, repo: str = None) -> None:
+    def __init__(self, gh: github.Requester.Requester, repo: str = None) -> None:
         self.gh_client = gh
         self.owner, self.repo_name = self._get_repo_name_and_owner(repo)
+        self.rate_limit = GitHubGraphQLRateLimit()
         self.existing_rules: list[BranchProtectionRule] = self.get_branch_protection_rules()
         self.deleted: list[BranchProtectionRule] = []
 
@@ -168,41 +188,13 @@ class GitHubBranchProtectionRulesManager:
 
         return should
 
-    def handle_rate_limit(self, headers: dict[str, str]):
-        """
-        Handle rate limiting.
-
-        Arguments:
-        - `headers` (``dict[str, str]): The response headers.
-        """
-
-        rl = GitHubGraphQLRateLimit(
-            limit=headers.get(GitHubGraphQLRateLimit.HEADER_LIMIT),
-            remaining=headers.get(GitHubGraphQLRateLimit.HEADER_REMAINING),
-            reset=headers.get(GitHubGraphQLRateLimit.HEADER_RESET),
-            used=headers.get(GitHubGraphQLRateLimit.HEADER_USED)
-        )
-
-        if rl.exceeded():
-            logger.warning(f"The  GitHub GraphQL API request rate limit ({rl.limit}) has been exceeded. It resets at {rl.reset}. Terminating...")
-            sys.exit(0)
-
     def get_branch_protection_rules(self) -> list[BranchProtectionRule]:
         """
         Get all branch protection rules
         """
 
         result: list[BranchProtectionRule] = []
-
-        variables = {
-            "owner": self.owner,
-            "name": self.repo_name
-        }
-
-        data = self.send_request(
-            query=self.GET_BRANCH_PROTECTION_GRAPHQL_QUERY_TEMPLATE,
-            variables=variables
-        )
+        data = self.get_rules_request()
 
         result.extend(self._convert_dict_to_bpr(data))
 
@@ -290,19 +282,23 @@ class GitHubBranchProtectionRulesManager:
         we exit 1.
         """
 
+        if self.rate_limit.limit != 0 and self.rate_limit._exceeded():
+            
+
         logger.debug("Sending GraphQL request...")
         logger.debug(f"{query}")
         logger.debug(f"{variables}")
 
         try:
-            headers, data = self.gh_client._Github__requester.graphql_query(
+            headers, data = self.gh_client.graphql_query(
                 query=query,
                 variables=variables
             )
 
-            self.handle_rate_limit(headers)
+            logger.debug(f"Response data: {data}")
+            self.rate_limit.parse(headers)
+            self.rate_limit.handle()
 
-            logger.debug(data)
             return data
         except github.GithubException as gh_exc:
             logger.error(f"Error sending GraphQL request: {gh_exc}")
@@ -323,6 +319,22 @@ class GitHubBranchProtectionRulesManager:
 
         self.send_request(
             self.DELETE_BRANCH_PROTECTION_RULE_QUERY_TEMPLATE,
+            variables=variables
+        )
+
+    def get_rules_request(self) -> dict[str, Any]:
+        """
+        Send a request to GitHub GraphQL API to get all
+        branch protection rules.
+        """
+
+        variables = {
+            "owner": self.owner,
+            "name": self.repo_name
+        }
+
+        return self.send_request(
+            self.GET_BRANCH_PROTECTION_GRAPHQL_QUERY_TEMPLATE,
             variables=variables
         )
 
@@ -348,24 +360,6 @@ class GitHubBranchProtectionRulesManager:
             logger.debug("Finished writing jobs summary to Markdown to file")
         else:
             logger.info(f"Environmental variable '{GH_JOB_SUMMARY_ENV_VAR}' not set. Skipping writing job summary for deleted rules...")
-
-
-def validate_gh_token() -> str:
-    """
-    Check if GITHUB_TOKEN env var is set.
-
-    Returns:
-    - The token as an `str`.
-
-    Raises:
-    - `OSError` if it's not set.
-    """
-
-    token = os.getenv(GH_TOKEN_ENV_VAR)
-    if not token:
-        raise OSError(f"Error: The '{GH_TOKEN_ENV_VAR}' environment variable is not set.")
-    else:
-        return token
 
 
 def main(args: list[str] | None):
@@ -416,7 +410,9 @@ def main(args: list[str] | None):
 
     try:
         if args.command in ["purge", "delete"]:
-            token = validate_gh_token()
+            token = os.getenv(GH_TOKEN_ENV_VAR)
+            if not token:
+                raise OSError(f"Error: The '{GH_TOKEN_ENV_VAR}' environment variable is not set.")
 
             logger.info("Authenticating with GitHub...")
             auth = github.Auth.Token(token)
@@ -426,9 +422,9 @@ def main(args: list[str] | None):
             logger.info("Finished authenticating with GitHub")
 
             if args.org and args.repo:
-                manager = GitHubBranchProtectionRulesManager(gh=gh, repo=f"{args.org}/{args.repo}")
+                manager = GitHubBranchProtectionRulesManager(gh=gh._Github__requester, repo=f"{args.org}/{args.repo}")
             else:
-                manager = GitHubBranchProtectionRulesManager(gh=gh)
+                manager = GitHubBranchProtectionRulesManager(gh=gh._Github__requester)
 
             if args.command == "purge":
                 manager.purge_branch_protection_rules()
@@ -440,8 +436,8 @@ def main(args: list[str] | None):
             manager.write_deleted_summary_to_file()
         else:
             parser.print_help()
-    except Exception as e:
-        logger.error(f"Error running script '{__file__}': {e}")
+    except Exception:
+        logger.exception(f"Error running script '{__file__}'")
         exit_code = 1
     finally:
         sys.exit(exit_code)
