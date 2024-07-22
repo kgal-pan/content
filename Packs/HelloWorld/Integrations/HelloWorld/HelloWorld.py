@@ -17,7 +17,6 @@ HelloWorld API
 --------------
 The HelloWorld API is a simple API that shows a realistic use case for an XSOAR
 integration.
-
 This API has a few basic functions:
 - Alerts: the endpoint returns mocked alerts and allows you to search based on
 a number of parameters, such as severity. It
