@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: manage_branch_protection_log_delete_branch
-          path: ${{ GITHUB_WORKSPACE }}/.github/github_workflow_scripts/manage_branch_protection.log
+          path: "${{ github.workspace }}/.github/github_workflow_scripts/manage_branch_protection.log"
 
 
   delete_orphaned_protection_rules:
@@ -70,4 +70,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: manage_branch_protection_log_purge
-          path: ${{ GITHUB_WORKSPACE }}/.github/github_workflow_scripts/manage_branch_protection.log
+          path: "${{ github.workspace }}/.github/github_workflow_scripts/manage_branch_protection.log"
