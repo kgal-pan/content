@@ -13,7 +13,6 @@ must be placed in the design. We recommend to fill a Design Document template,
 that allows you to capture Use Cases, Requirements and Inputs/Outputs.
 Example Design document for the this Integration (HelloWorld):
 https://docs.google.com/document/d/1wETtBEKg37PHNU8tYeB56M1LE314ux086z3HFeF_cX0
-
 HelloWorld API
 --------------
 The HelloWorld API is a simple API that shows a realistic use case for an XSOAR
