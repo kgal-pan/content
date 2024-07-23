@@ -10,7 +10,7 @@ from requests_mock import Mocker
 from manage_branch_protection import (
     GitHubBranchProtectionRulesManager,
     GH_REPO_ENV_VAR,
-    GitHubGraphQLRateLimit
+    GH_JOB_SUMMARY_ENV_VAR
 )
 
 test_data_path = Path(__file__).parent.absolute() / "github_workflow_scripts_tests" / "test_files"
@@ -264,3 +264,46 @@ class TestManageBranchProtectionRules():
         actual_rules = manager._convert_dict_to_bpr({"data": "unexpected"})
 
         assert not actual_rules
+
+    def test_md_summary_output(
+            self,
+            mocker: MockerFixture,
+            manager: GitHubBranchProtectionRulesManager,
+            tmp_path: Path,
+            requests_mock: Mocker
+    ):
+        """
+        Test the output of the summary file generated.
+
+        Given:
+        - A temporary directory.
+
+        When:
+        - The `GITHUB_STEP_SUMMARY` env var is set to the temporary directory.
+        - A rule is deleted.
+
+        Then:
+        - The summary file exists in the temporary directory.
+        - The summary includes the rule that was deleted.
+
+        """
+
+        summary_file_path = tmp_path / "summary.md"
+        mocker.patch.dict(os.environ, {GH_JOB_SUMMARY_ENV_VAR: str(summary_file_path)})
+
+        input_pattern = "contrib/some_leftover"
+
+        requests_mock.post(
+            url="https://api.github.com:443/graphql",
+            status_code=200,
+            headers=self.protection_rules_response_headers,
+            json=self.delete_protection_rule_response
+        )
+
+        manager.delete_branch_protection_rule(input_pattern)
+        manager.write_deleted_summary_to_file()
+
+        assert summary_file_path.exists()
+        actual_summary_lines = summary_file_path.read_text().splitlines()
+        assert len(actual_summary_lines) == 5
+        assert input_pattern in actual_summary_lines[4]
