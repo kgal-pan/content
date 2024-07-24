@@ -368,3 +368,49 @@ class TestManageBranchProtectionRules():
 
         with pytest.raises(github.RateLimitExceededException, match=re.escape("The GitHub GraphQL API request rate limit (5000) has been exceeded. It resets at 2024-07-16 11:51:24+00:00.")):
             GitHubBranchProtectionRulesManager(gh=gh._Github__requester)
+
+    def test_invalid_repo(self):
+        """
+        Test behavior when an invalid repo is provided.
+
+        Given:
+        - A repo name.
+
+        When:
+        - The repo name is invalid.
+
+        Then:
+        - A `ValueError` with appropriate message is thrown.
+        """
+
+        auth = github.Auth.Token("unauthorized_token")
+        gh = Github(auth=auth, verify=False)
+        invalid_repo_name = "org1/org2/repo_name"
+
+        with pytest.raises(ValueError, match="Input string must be in the format 'owner/repository'."):
+            GitHubBranchProtectionRulesManager(gh=gh._Github__requester, repo=invalid_repo_name)
+
+    def test_invalid_headers_none(self, manager: GitHubBranchProtectionRulesManager):
+        """
+        Test behavior when an invalid header is provided to
+        `GitHubGraphQLRateLimit.set_from_headers`.
+
+        Given:
+        - A `dict` of headers.
+
+        When:
+        - The `dict` has a `None` value.
+
+        Then:
+        - A `TypeError` is raised.
+        """
+
+        invalid_headers = {
+            "limit": None,
+            "remaining": "5",
+            "reset": "12345674",
+            "used": "4995"
+        }
+
+        with pytest.raises(TypeError):
+            manager.rate_limit.set_from_headers(invalid_headers)

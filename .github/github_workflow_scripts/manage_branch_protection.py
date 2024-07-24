@@ -91,10 +91,10 @@ class GitHubGraphQLRateLimit:
             self.used = int(headers.get(GitHubGraphQLRateLimit.HEADER_USED))
         except (ValueError, TypeError) as e:
             logger.error(f"{e.__class__.__name__} casting header to integer: {e}")
-            raise e
+            raise e.__class__(f"{e.__class__.__name__} casting header to integer: {e}")
         except (OSError, OverflowError) as e:
             logger.error(f"{e.__class__.__name__} converting 'reset' to a datetime: {e}")
-            raise e
+            raise e.__class__(f"{e.__class__.__name__} casting header to integer: {e}")
 
     def set_from_data(self, data: dict[str, Any]):
 
@@ -132,9 +132,6 @@ class GitHubBranchProtectionRulesManager:
     # These are the protection rules that should never be deleted
     PROTECTED_RULES = ["contrib/**/*"]
 
-    RULES_FETCH_LIMIT = 100
-
-    # TODO check how we can set RULES_FETCH_LIMIT to first: 100
     GET_BRANCH_PROTECTION_GRAPHQL_QUERY_TEMPLATE = """query($owner: String!, $name: String!) {
     repository(owner: $owner, name: $name) {
         branchProtectionRules(first: 100) {
