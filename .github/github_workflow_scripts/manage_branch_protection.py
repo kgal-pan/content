@@ -81,16 +81,33 @@ class GitHubGraphQLRateLimit:
         return self.limit != 0
 
     def set_from_headers(self, headers: dict[str, str]):
-        self.limit = int(headers.get(GitHubGraphQLRateLimit.HEADER_LIMIT))
-        self.remaining = int(headers.get(GitHubGraphQLRateLimit.HEADER_REMAINING))
-        self.reset = datetime.fromtimestamp(int(headers.get(GitHubGraphQLRateLimit.HEADER_RESET)), timezone.utc)
-        self.used = int(headers.get(GitHubGraphQLRateLimit.HEADER_USED))
+
+        logger.debug(f"Parsing rate limit from {headers=}...")
+
+        try:
+            self.limit = int(headers.get(GitHubGraphQLRateLimit.HEADER_LIMIT))
+            self.remaining = int(headers.get(GitHubGraphQLRateLimit.HEADER_REMAINING))
+            self.reset = datetime.fromtimestamp(int(headers.get(GitHubGraphQLRateLimit.HEADER_RESET)), timezone.utc)
+            self.used = int(headers.get(GitHubGraphQLRateLimit.HEADER_USED))
+        except (ValueError, TypeError) as e:
+            logger.error(f"{e.__class__.__name__} casting header to integer: {e}")
+            raise e
+        except (OSError, OverflowError) as e:
+            logger.error(f"{e.__class__.__name__} converting 'reset' to a datetime: {e}")
+            raise e
 
     def set_from_data(self, data: dict[str, Any]):
-        self.limit = data.get("data").get("rateLimit").get("limit")
-        self.remaining = data.get("data").get("rateLimit").get("remaining")
-        self.reset = datetime.strptime(data.get("data").get("rateLimit").get("resetAt"), "%Y-%m-%dT%H:%M:%SZ")
-        self.used = data.get("data").get("rateLimit").get("used")
+
+        logger.debug(f"Parsing rate limit from {data=}...")
+
+        try:
+            self.limit = data.get("data").get("rateLimit").get("limit")
+            self.remaining = data.get("data").get("rateLimit").get("remaining")
+            self.reset = datetime.strptime(data.get("data").get("rateLimit").get("resetAt"), "%Y-%m-%dT%H:%M:%SZ")
+            self.used = data.get("data").get("rateLimit").get("used")
+        except (AttributeError, TypeError, ValueError) as e:
+            logger.error(f"{e.__class__.__name__} setting rate limit from data: {e}")
+            raise e
 
     def handle(self) -> None:
         """
@@ -98,9 +115,7 @@ class GitHubGraphQLRateLimit:
         """
 
         if self._is_init() and self._exceeded():
-            logger.error(f"The GitHub GraphQL API request rate limit ({self.limit}) has been exceeded. It resets at {self.reset}.")
-            logger.info("Terminating...")
-            sys.exit(0)
+            raise github.RateLimitExceededException(f"The GitHub GraphQL API request rate limit ({self.limit}) has been exceeded. It resets at {self.reset}.")
 
         elif self._is_low():
             logger.warning(f"There are {self.remaining} remaining GitHub GraphQL API requests. It resets at {self.reset}.")
@@ -326,9 +341,8 @@ class GitHubBranchProtectionRulesManager:
             self.rate_limit.handle()
 
             return data
-        except github.GithubException as gh_exc:
-            logger.error(f"Error sending GraphQL request: {gh_exc}")
-            sys.exit(1)
+        except github.BadCredentialsException:
+            raise PermissionError(f"Request failed because of a credential error. Validate that the value of {GH_TOKEN_ENV_VAR} has the correct scope to perform the request.")
 
     def send_rule_delete_request(self, rule_id: str):
         """
@@ -396,7 +410,7 @@ class GitHubBranchProtectionRulesManager:
             logger.info(f"Environmental variable '{GH_JOB_SUMMARY_ENV_VAR}' not set. Skipping writing job summary for deleted rules...")
 
 
-def main(args: list[str] | None):
+def main(args: list[str] = None):
 
     exit_code = 0
 
@@ -451,7 +465,7 @@ def main(args: list[str] | None):
             logger.info("Authenticating with GitHub...")
             auth = github.Auth.Token(token)
 
-            # TODO rm verify after testing (throwing self-signed cert errors)
+            # TODO rm verify after testing (throwing self-signed cert errors locally)
             gh = Github(auth=auth, verify=False)
             logger.info("Finished authenticating with GitHub")
 
@@ -470,8 +484,8 @@ def main(args: list[str] | None):
             manager.write_deleted_summary_to_file()
         else:
             parser.print_help()
-    except Exception:
-        logger.exception(f"Error running script '{__file__}'")
+    except Exception as e:
+        logger.exception(f"Error {e.__class__.__name__} running script '{__file__}': {e}")
         exit_code = 1
     finally:
         sys.exit(exit_code)
