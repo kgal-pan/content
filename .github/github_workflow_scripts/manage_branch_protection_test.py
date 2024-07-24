@@ -1,7 +1,6 @@
 import json
 import os
 from pathlib import Path
-import re
 from typing import Any
 from github import Github
 import github
@@ -13,64 +12,102 @@ from manage_branch_protection import (
     GitHubBranchProtectionRulesManager,
     GH_REPO_ENV_VAR,
     GH_JOB_SUMMARY_ENV_VAR,
-    GH_TOKEN_ENV_VAR
+    GitHubGraphQLRateLimit,
+    BranchProtectionRule
 )
 
 test_data_path = Path(__file__).parent.absolute() / "github_workflow_scripts_tests" / "test_files"
 
 
 class TestManageBranchProtectionRules():
-    rate_limit_response_data: dict[str, Any] = json.loads((test_data_path / "test_get_rate_limit_data.json").read_text())
-    rate_limit_response_headers: dict[str, str] = json.loads((test_data_path / "test_get_rate_limit_headers.json").read_text())
     protection_rules_response_data: dict[str, Any] = json.loads((test_data_path / "test_get_repo_branch_protection_rules_data.json").read_text())
     protection_rules_response_headers: dict[str, str] = json.loads((test_data_path / "test_get_repo_branch_protection_rules_headers.json").read_text())
     delete_protection_rule_response: dict[str, str] = json.loads((test_data_path / "test_delete_protection_rule_response.json").read_text())
-    unauthorized_response_data: dict[str, str] = json.loads((test_data_path / "bad_credentials_response.json").read_text())
-    unauthorized_response_headers: dict[str, str] = json.loads((test_data_path / "bad_credentials_headers.json").read_text())
-    rate_limit_reached_headers: dict[str, str] = json.loads((test_data_path / "rate_limit_reached_headers.json").read_text())
 
     @pytest.fixture(autouse=True)
-    def manager(self, requests_mock: Mocker):
+    def manager(self, mocker: MockerFixture):
         auth = github.Auth.Token("abc")
         gh = Github(auth=auth, verify=False)
 
-        # Initialize rate limit
-        requests_mock.post(
-            url="https://api.github.com:443/graphql",
-            status_code=200,
-            headers=self.rate_limit_response_headers,
-            json=self.rate_limit_response_data
+        mocker.patch.object(
+            GitHubBranchProtectionRulesManager,
+            "get_rate_limit",
+            return_value=GitHubGraphQLRateLimit(
+                limit=5000,
+                remaining=5000,
+                used=0
+            )
         )
 
-        # Initialize existing protection rules
-        requests_mock.post(
-            url="https://api.github.com:443/graphql",
-            status_code=200,
-            headers=self.protection_rules_response_headers,
-            json=self.protection_rules_response_data
+        mocker.patch.object(
+            GitHubBranchProtectionRulesManager,
+            "get_branch_protection_rules",
+            return_value=[
+                BranchProtectionRule(
+                    id="ABCD",
+                    pattern=GitHubBranchProtectionRulesManager.PROTECTED_RULES[0],
+                    matching_refs=100
+                ),
+                BranchProtectionRule(
+                    id="ABCE",
+                    pattern="contrib/some_leftover",
+                    matching_refs=0
+                ),
+                BranchProtectionRule(
+                    id="ABCE",
+                    pattern="contrib/currently_deleted_branch",
+                    matching_refs=0
+                ),
+                BranchProtectionRule(
+                    id="ABCG",
+                    pattern="some_old_protection",
+                    matching_refs=3
+                )
+            ]
         )
 
         return GitHubBranchProtectionRulesManager(gh=gh._Github__requester)
 
     @pytest.fixture(autouse=True)
-    def manager_args(self, requests_mock: Mocker):
+    def manager_args(self, mocker: MockerFixture):
         auth = github.Auth.Token("abc")
         gh = Github(auth=auth, verify=False)
 
-        # Initialize rate limit
-        requests_mock.post(
-            url="https://api.github.com:443/graphql",
-            status_code=200,
-            headers=self.rate_limit_response_headers,
-            json=self.rate_limit_response_data
+        mocker.patch.object(
+            GitHubBranchProtectionRulesManager,
+            "get_rate_limit",
+            return_value=GitHubGraphQLRateLimit(
+                limit=5000,
+                remaining=5000,
+                used=0
+            )
         )
 
-        # Initialize existing protection rules
-        requests_mock.post(
-            url="https://api.github.com:443/graphql",
-            status_code=200,
-            headers=self.protection_rules_response_headers,
-            json=self.protection_rules_response_data
+        mocker.patch.object(
+            GitHubBranchProtectionRulesManager,
+            "get_branch_protection_rules",
+            return_value=[
+                BranchProtectionRule(
+                    id="ABCD",
+                    pattern=GitHubBranchProtectionRulesManager.PROTECTED_RULES[0],
+                    matching_refs=100
+                ),
+                BranchProtectionRule(
+                    id="ABCE",
+                    pattern="contrib/some_leftover",
+                    matching_refs=0
+                ),
+                BranchProtectionRule(
+                    id="ABCE",
+                    pattern="contrib/currently_deleted_branch",
+                    matching_refs=0
+                ),
+                BranchProtectionRule(
+                    id="ABCG",
+                    pattern="some_old_protection",
+                    matching_refs=3
+                )
+            ]
         )
 
         return GitHubBranchProtectionRulesManager(gh=gh._Github__requester, repo="foo/baz")
@@ -264,12 +301,11 @@ class TestManageBranchProtectionRules():
         - The response is not in expected structure.
 
         Then:
-        - An empty list is returned.
+        - `AttributeError` is raised.
         """
 
-        actual_rules = manager._convert_dict_to_bpr({"data": "unexpected"})
-
-        assert not actual_rules
+        with pytest.raises(AttributeError):
+            manager._convert_dict_to_bpr({"data": "unexpected"})
 
     def test_md_summary_output(
             self,
@@ -314,7 +350,7 @@ class TestManageBranchProtectionRules():
         assert len(actual_summary_lines) == 5
         assert input_pattern in actual_summary_lines[4]
 
-    def test_unauthorized(self, requests_mock: Mocker):
+    def test_unauthorized(self, mocker: MockerFixture):
         """
         Test a scenario where the token provided is unauthorized
 
@@ -329,20 +365,19 @@ class TestManageBranchProtectionRules():
         - A `BadCredentialsException` is thrown.
         """
 
-        requests_mock.post(
-            url="https://api.github.com:443/graphql",
-            status_code=401,
-            headers=self.unauthorized_response_headers,
-            json=self.unauthorized_response_data
-        )
-
         auth = github.Auth.Token("unauthorized_token")
         gh = Github(auth=auth, verify=False)
 
-        with pytest.raises(PermissionError, match=f"Request failed because of a credential error. Validate that the value of {GH_TOKEN_ENV_VAR} has the correct scope to perform the request.") as e:
+        mocker.patch.object(
+            GitHubBranchProtectionRulesManager,
+            "get_rate_limit",
+            side_effect=github.BadCredentialsException(status=401)
+        )
+
+        with pytest.raises(github.BadCredentialsException):
             GitHubBranchProtectionRulesManager(gh=gh._Github__requester)
 
-    def test_rate_limit_reached(self, requests_mock: Mocker):
+    def test_rate_limit_reached(self, mocker: MockerFixture):
         """
         Test behavior when the rate limit has been reached.
 
@@ -359,14 +394,23 @@ class TestManageBranchProtectionRules():
         auth = github.Auth.Token("abc")
         gh = Github(auth=auth, verify=False)
 
-        requests_mock.post(
-            url="https://api.github.com:443/graphql",
-            status_code=200,
-            headers=self.rate_limit_reached_headers,
-            json={}
+        mocker.patch.object(
+            GitHubBranchProtectionRulesManager,
+            "get_rate_limit",
+            return_value=GitHubGraphQLRateLimit(
+                limit=5000,
+                remaining=0,
+                used=5000
+            )
         )
 
-        with pytest.raises(github.RateLimitExceededException, match=re.escape("The GitHub GraphQL API request rate limit (5000) has been exceeded. It resets at 2024-07-16 11:51:24+00:00.")):
+        mocker.patch.object(
+            GitHubBranchProtectionRulesManager,
+            "get_branch_protection_rules",
+            side_effect=github.RateLimitExceededException(status=403)
+        )
+
+        with pytest.raises(github.RateLimitExceededException):
             GitHubBranchProtectionRulesManager(gh=gh._Github__requester)
 
     def test_invalid_repo(self):

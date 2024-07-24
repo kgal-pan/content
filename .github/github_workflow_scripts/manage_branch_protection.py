@@ -16,6 +16,7 @@ from typing import Any
 
 from github import Github
 import github
+import github.Rate
 import github.Requester
 
 
@@ -71,7 +72,7 @@ class GitHubGraphQLRateLimit:
         """
         return self.remaining == 0
 
-    def _is_low(self) -> bool:
+    def is_low(self) -> bool:
         """
         Whether we're low in remaining requests.
         """
@@ -81,6 +82,19 @@ class GitHubGraphQLRateLimit:
         return self.limit != 0
 
     def set_from_headers(self, headers: dict[str, str]):
+        """
+        Helper method to parse and set the instance
+        attributes from an incoming headers.
+
+        Arguments:
+        - `headers` (``dict[str, str]``): The response headers to parse
+        and set.
+
+        Raises:
+        - `ValueError | TypeError` if the headers cannot be converted to an
+        integer.
+        - `OSError, OverflowError` if the `reset` key can't be parsed as `datetime`.
+        """
 
         logger.debug(f"Parsing rate limit from {headers=}...")
 
@@ -90,35 +104,39 @@ class GitHubGraphQLRateLimit:
             self.reset = datetime.fromtimestamp(int(headers.get(GitHubGraphQLRateLimit.HEADER_RESET)), timezone.utc)
             self.used = int(headers.get(GitHubGraphQLRateLimit.HEADER_USED))
         except (ValueError, TypeError) as e:
-            logger.error(f"{e.__class__.__name__} casting header to integer: {e}")
-            raise e.__class__(f"{e.__class__.__name__} casting header to integer: {e}")
+            raise e.__class__(f"Error casting header to integer: {e}")
         except (OSError, OverflowError) as e:
-            logger.error(f"{e.__class__.__name__} converting 'reset' to a datetime: {e}")
-            raise e.__class__(f"{e.__class__.__name__} casting header to integer: {e}")
+            raise e.__class__(f"Error converting 'reset' key to a datetime: {e}")
 
-    def set_from_data(self, data: dict[str, Any]):
+    @classmethod
+    def get_from_data(cls, data: dict[str, Any]) -> 'GitHubGraphQLRateLimit':
+        """
+        Helper method to parse and set the instance
+        attributes from an incoming response data.
+
+        Arguments:
+        - `data` (``dict[str, str]``): The response data to parse
+        and set.
+
+        Returns:
+        - An instance of `GitHubGraphQLRateLimit` 
+
+        Raises:
+        - `AttributeError | TypeError | ValueError)` if the data
+        cannot be parsed.
+        """
 
         logger.debug(f"Parsing rate limit from {data=}...")
 
         try:
-            self.limit = data.get("data").get("rateLimit").get("limit")
-            self.remaining = data.get("data").get("rateLimit").get("remaining")
-            self.reset = datetime.strptime(data.get("data").get("rateLimit").get("resetAt"), "%Y-%m-%dT%H:%M:%SZ")
-            self.used = data.get("data").get("rateLimit").get("used")
+            return GitHubGraphQLRateLimit(
+                limit=data.get("data").get("rateLimit").get("limit"),
+                remaining=data.get("data").get("rateLimit").get("remaining"),
+                reset=datetime.strptime(data.get("data").get("rateLimit").get("resetAt"), "%Y-%m-%dT%H:%M:%SZ"),
+                used=data.get("data").get("rateLimit").get("used")
+            )
         except (AttributeError, TypeError, ValueError) as e:
-            logger.error(f"{e.__class__.__name__} setting rate limit from data: {e}")
-            raise e
-
-    def handle(self) -> None:
-        """
-        Handles the rate limiting.
-        """
-
-        if self._is_init() and self._exceeded():
-            raise github.RateLimitExceededException(f"The GitHub GraphQL API request rate limit ({self.limit}) has been exceeded. It resets at {self.reset}.")
-
-        elif self._is_low():
-            logger.warning(f"There are {self.remaining} remaining GitHub GraphQL API requests. It resets at {self.reset}.")
+            raise e.__class__(f"Error setting rate limit from data: {e}")
 
 
 @dataclass
@@ -167,8 +185,7 @@ class GitHubBranchProtectionRulesManager:
     def __init__(self, gh: github.Requester.Requester, repo: str = None) -> None:
         self.gh_client = gh
         self.owner, self.repo_name = self._get_repo_name_and_owner(repo)
-        self.rate_limit = GitHubGraphQLRateLimit()
-        self._init_rate_limit()
+        self.rate_limit = self.get_rate_limit()
         self.existing_rules: list[BranchProtectionRule] = self.get_branch_protection_rules()
         self.deleted: list[BranchProtectionRule] = []
 
@@ -234,6 +251,11 @@ class GitHubBranchProtectionRulesManager:
 
         return result
 
+    def get_rate_limit(self) -> GitHubGraphQLRateLimit:
+        rate_limit = self.send_get_rate_limit_request()
+
+        return GitHubGraphQLRateLimit.get_from_data(rate_limit)
+
     def delete_branch_protection_rule(self, pattern: str) -> None:
         """
         Delete a specified branch protection rule. If no pattern
@@ -273,13 +295,6 @@ class GitHubBranchProtectionRulesManager:
                 logger.info(f"Rule {rule} was deleted successfully.")
                 self.deleted.append(rule)
 
-    def _init_rate_limit(self):
-        """
-        Initialize the rate limit attribute.
-        """
-
-        self.send_get_rate_limit_request()
-
     def _convert_dict_to_bpr(self, response: dict[str, Any]) -> list[BranchProtectionRule]:
 
         """
@@ -292,6 +307,9 @@ class GitHubBranchProtectionRulesManager:
         Returns:
         - a `list[BranchProtectionRule]`. In case we have an issue
         parsing the response, we return an empty list.
+
+        Raises:
+        - `KeyError | AttributeError` in case the conversion fails.
         """
 
         rules: list[BranchProtectionRule] = []
@@ -305,10 +323,10 @@ class GitHubBranchProtectionRulesManager:
                 )
 
                 rules.append(rule)
-        except KeyError as ke:
-            logger.error(f"Error parsing '{response=}' as a branch protection rule: {ke}")
-        finally:
-            return rules
+        except (KeyError, AttributeError) as e:
+            raise e.__class__(f"{e.__class__.__name__} parsing '{response=}' as a branch protection rule: {e}")
+
+        return rules
 
     def send_request(self, query: str, variables: dict[str, str]) -> dict[str, str]:
         """
@@ -319,13 +337,15 @@ class GitHubBranchProtectionRulesManager:
         - `variables` (``dict[str, str]``): The variables to send the query.
 
         Returns:
-        - A `dict[str, str]` with the response. If the response fails, 
-        we exit 1.
+        - A `dict[str, str]` with the response.
+
+        Raises:
+        If the request fails, we raise
         """
 
         logger.debug("Sending GraphQL request...")
-        logger.debug(f"{query}")
-        logger.debug(f"{variables}")
+        logger.debug(f"{query=}")
+        logger.debug(f"{variables=}")
 
         try:
             headers, data = self.gh_client.graphql_query(
@@ -333,13 +353,20 @@ class GitHubBranchProtectionRulesManager:
                 variables=variables
             )
 
-            logger.debug(f"Response data: {data}")
-            self.rate_limit.set_from_headers(headers)
-            self.rate_limit.handle()
+            logger.debug(f"Response {data=}")
+
+            # When initializing the manager, we don't have a rate limit
+            # defined yet.
+            if hasattr(self, "rate_limit"):
+                self.rate_limit.set_from_headers(headers)
+                if self.rate_limit.is_low():
+                    logger.warning(f"There are {self.rate_limit.remaining} remaining GitHub GraphQL API requests. It resets at {self.rate_limit.reset}.")
 
             return data
-        except github.BadCredentialsException:
-            raise PermissionError(f"Request failed because of a credential error. Validate that the value of {GH_TOKEN_ENV_VAR} has the correct scope to perform the request.")
+        except github.BadCredentialsException as e:
+            raise PermissionError(f"The request failed because of a credential error ({e}). Validate that the value of {GH_TOKEN_ENV_VAR} has the correct scope to perform the request.")
+        except github.RateLimitExceededException:
+            raise RuntimeError(f"The rate limit ({self.limit}) was reached. It resets at {self.reset}.")
 
     def send_rule_delete_request(self, rule_id: str):
         """
