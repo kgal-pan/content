@@ -211,14 +211,15 @@ def send_request(gh_requester: github.Requester.Requester, query: str, variables
     logger.debug(f"{query=}")
     logger.debug(f"{variables=}")
 
-    _, data = gh_requester.graphql_query(
+    response_headers, response_data = gh_requester.graphql_query(
         query=query,
         variables=variables
     )
 
-    logger.debug(f"Response {data=}")
+    logger.debug(f"{response_data=}")
+    logger.debug(f"{response_headers=}")
 
-    return data
+    return response_data
 
 
 # API Functions
