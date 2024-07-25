@@ -30,14 +30,23 @@ PROTECTED_RULES = ["contrib/**/*"]
 
 # Logging setup
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
-logging.basicConfig(level=logging.DEBUG,
-                    format=LOG_FORMAT,
-                    handlers=[
-                        logging.FileHandler(f"{Path(__file__).stem}.log"),
-                        logging.StreamHandler()
-                    ])
-
+# Create logger
 logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)  # Set the lowest level to capture all messages
+
+# Create FileHandler and set level to DEBUG
+file_handler = logging.FileHandler(f"{Path(__file__).stem}.log")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+
+# Create StreamHandler and set level to INFO
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)
+stream_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+
+# Add handlers to the logger
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
 
 
 @dataclass
