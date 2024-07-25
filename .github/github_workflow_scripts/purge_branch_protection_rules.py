@@ -322,8 +322,7 @@ def main():
         logger.info("Authenticating with GitHub...")
         auth = github.Auth.Token(token)
 
-        # TODO rm verify after testing (throwing self-signed cert errors locally)
-        gh_client = Github(auth=auth, verify=False)
+        gh_client = Github(auth=auth)
         logger.info("Finished authenticating with GitHub")
 
         requester: github.Requester.Requester = gh_client._Github__requester
