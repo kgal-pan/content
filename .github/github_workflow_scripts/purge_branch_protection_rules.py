@@ -6,18 +6,22 @@ branch protection rules.
 """
 
 from dataclasses import dataclass
-import logging
 import os
 from pathlib import Path
 import sys
 from typing import Any
 
-from github import Github
+import tabulate
+from utils import get_logger
+
+from github import (
+    Github,
+    RateLimitExceededException,
+    GithubException
+)
 import github
 import github.Requester
 
-
-DEFAULT_REPO = "demisto/content"
 
 GH_TOKEN_ENV_VAR = "GITHUB_TOKEN"
 
@@ -25,27 +29,9 @@ GH_TOKEN_ENV_VAR = "GITHUB_TOKEN"
 # e.g. 'demisto/content'
 GH_REPO_ENV_VAR = "GITHUB_REPOSITORY"
 GH_JOB_SUMMARY_ENV_VAR = "GITHUB_STEP_SUMMARY"
-PROTECTED_RULES = ["contrib/**/*"]
+PROTECTED_RULES = ["contrib/**/*", "master"]
 
-# Logging setup
-LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
-# Create logger
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)  # Set the lowest level to capture all messages
-
-# Create FileHandler and set level to DEBUG
-file_handler = logging.FileHandler(f"{Path(__file__).stem}.log")
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(logging.Formatter(LOG_FORMAT))
-
-# Create StreamHandler and set level to INFO
-stream_handler = logging.StreamHandler()
-stream_handler.setLevel(logging.INFO)
-stream_handler.setFormatter(logging.Formatter(LOG_FORMAT))
-
-# Add handlers to the logger
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
+logger = get_logger(f"{Path(__file__).stem}")
 
 
 @dataclass
@@ -53,6 +39,8 @@ class BranchProtectionRule:
     id: str
     pattern: str
     matching_refs: int
+    error: GithubException | None = None
+    deleted: bool | None = None
 
 
 # Queries
@@ -90,7 +78,10 @@ def get_repo_owner_and_name() -> tuple[str, str]:
         `ValueError`: If the input string is not in the expected 'owner/repository' format.
     """
 
-    repo = os.getenv(GH_REPO_ENV_VAR, DEFAULT_REPO)
+    repo = os.getenv(GH_REPO_ENV_VAR)
+
+    if not repo:
+        raise OSError(f"Environmental variable '{GH_REPO_ENV_VAR}' not set.")
 
     parts = repo.split('/')
 
@@ -101,17 +92,16 @@ def get_repo_owner_and_name() -> tuple[str, str]:
     return owner, name
 
 
-def convert_response_to_bpr(response: dict[str, Any]) -> list[BranchProtectionRule]:
+def convert_response_to_rules(response: dict[str, Any]) -> list[BranchProtectionRule]:
     """
-    Helper method to convert the response to an instance of
-    `BranchProtectionRule`.
+    Helper method to convert the response to a list
+    of `BranchProtectionRule`.
 
     Arguments:
     - `response` (``dict[str, Any]``): The response data.
 
     Returns:
-    - a `list[BranchProtectionRule]`. In case we have an issue
-    parsing the response, we return an empty list.
+    - a `list[BranchProtectionRule]`.
 
     Raises:
     - `KeyError | AttributeError` in case the conversion fails.
@@ -134,7 +124,7 @@ def convert_response_to_bpr(response: dict[str, Any]) -> list[BranchProtectionRu
     return rules
 
 
-def should_delete_rule(rule: BranchProtectionRule) -> bool:
+def shouldnt_delete_rule(rule: BranchProtectionRule) -> str | None:
     """
     Check whether we should delete this rule.
     To determine if we should delete the rule we check that:
@@ -143,24 +133,26 @@ def should_delete_rule(rule: BranchProtectionRule) -> bool:
     * The rule does not apply to any branches.
 
     Returns:
-    - `True` if we can delete the rule, `False` otherwise.
+    - `str` with the message why it shouldn't be deleted,
+    `None` if it should be deleted.
     """
-
-    should = False
 
     if rule.pattern in PROTECTED_RULES:
-        logger.info(f"{rule} not deleted because it's in the list of protected rules '{','.join(PROTECTED_RULES)}'")
+        return f"Rule not deleted because it's in the list of protected rules '{','.join(PROTECTED_RULES)}'"
     elif rule.matching_refs > 0:
-        logger.info(f"{rule} not deleted because it's associated to {rule.matching_refs} existing branches/refs")
+        return f"Rule not deleted because it's associated to {rule.matching_refs} existing branches/refs"
     else:
-        should = True
-
-    return should
+        return None
 
 
-def write_deleted_summary_to_file(deleted: list[BranchProtectionRule]) -> None:
+def write_deleted_summary_to_file(processed: list[BranchProtectionRule]) -> None:
     """
-    Helper function to create a Markdown summary file for deleted branches.
+    Helper function to create a Markdown summary file for deleted branches
+    if the `GITHUB_STEP_SUMMARY` is set. See
+    https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary
+
+    Arguments:
+    - `deleted` (``list[BranchProtectionRule]``): A list of deleted `BranchProtectionRule`s.
     """
 
     if os.getenv(GH_JOB_SUMMARY_ENV_VAR):
@@ -171,12 +163,20 @@ def write_deleted_summary_to_file(deleted: list[BranchProtectionRule]) -> None:
             return
 
         header = "## Deleted Branch Protection Rules"
-        table_header = "| ID | Pattern | Matching Refs |\n| --- | ------- | ------------- |"
-        table_rows = [f"| {rule.id} | {rule.pattern} | {rule.matching_refs} |" for rule in deleted]
 
-        table_body = "\n".join(table_rows)
+        if not processed or all(not rule.deleted for rule in processed):
+            body = "### No branch protection rules were deleted"
+            markdown_content = f"{header}\n\n{body}\n"
+        else:
+            headers = ["ID", "Pattern", "Matching Refs", "Deleted", "Error"]
+            table_rows = [[rule.id, rule.pattern, rule.matching_refs, rule.deleted, rule.error] for rule in processed]
 
-        markdown_content = f"{header}\n\n{table_header}\n{table_body}\n"
+            table_body = tabulate.tabulate(
+                tabular_data=table_rows,
+                headers=headers,
+                tablefmt='github'
+            )
+            markdown_content = f"{header}\n\n{table_body}\n"
 
         logger.debug(f"Writing deleted jobs summary to Markdown to file '{fp}'...")
         logger.debug(markdown_content)
@@ -219,17 +219,14 @@ def send_request(gh_requester: github.Requester.Requester, query: str, variables
     If the request fails, we raise
     """
 
-    logger.debug("Sending GraphQL request...")
-    logger.debug(f"{query=}")
-    logger.debug(f"{variables=}")
+    logger.debug(f"Sending GraphQL request...\n{query=}\n{variables=}\n")
 
-    response_headers, response_data = gh_requester.graphql_query(
+    response_headers, response_data = gh_requester.graphql_query(  # type:ignore[attr-defined]
         query=query,
         variables=variables
     )
 
-    logger.debug(f"{response_data=}")
-    logger.debug(f"{response_headers=}")
+    logger.debug(f"Response received:\n{response_data=}\n{response_headers=}")
 
     return response_data
 
@@ -253,21 +250,37 @@ def purge_branch_protection_rules(
     - `list[BranchProtectionRule]` that were deleted
     """
 
-    deleted: list[BranchProtectionRule] = []
+    processed: list[BranchProtectionRule] = []
 
-    for rule in rules:
-        if should_delete_rule(rule):
-            logger.info(f"Deleting {rule}...")
+    num_of_rules = len(rules)
+    for i, rule in enumerate(rules, start=1):
+
+        progress = f"({i}/{num_of_rules})"
+        msg = shouldnt_delete_rule(rule)
+        if not msg:
+            logger.info(f"{progress} Deleting {rule}...")
 
             query = DELETE_BRANCH_PROTECTION_RULE_QUERY_TEMPLATE
             variables = {
                 "branchProtectionRuleId": rule.id
             }
-            send_request(gh_requester, query, variables)
-            logger.info(f"{rule} was deleted successfully.")
-            deleted.append(rule)
-
-    return deleted
+            try:
+                send_request(gh_requester, query, variables)
+                rule.deleted = True
+                logger.info(f"{rule} was deleted successfully.")
+            except RateLimitExceededException:
+                rule.deleted = False
+                logger.error(f"Rate limit exceeded while attempting to delete {rule}. Terminating...")
+                raise SystemExit(1)
+            except GithubException as e:
+                rule.deleted = False
+                rule.error = e
+                logger.info(f"{e.__class__.__name__} thrown while attempting to delete {rule}. Rule was not deleted.")
+        else:
+            rule.deleted = False
+            logger.info(f"{progress} Skipping deletion of {rule}. Reason: {msg}")
+        processed.append(rule)
+    return processed
 
 
 def get_branch_protection_rules(
@@ -297,7 +310,7 @@ def get_branch_protection_rules(
     )
 
     logger.debug("Converting response to BranchProtectionRules...")
-    existing_rules = convert_response_to_bpr(data)
+    existing_rules = convert_response_to_rules(data)
     logger.debug("Finished converting response to BranchProtectionRules")
     return existing_rules
 
@@ -328,7 +341,7 @@ def main():
         gh_client = Github(auth=auth)
         logger.info("Finished authenticating with GitHub")
 
-        requester: github.Requester.Requester = gh_client._Github__requester
+        requester: github.Requester.Requester = gh_client._Github__requester  # type:ignore[attr-defined]
 
         logger.info("Sending request to get protection rules...")
         existing_rules = get_branch_protection_rules(
@@ -339,11 +352,20 @@ def main():
         logger.info(f"{len(existing_rules)} rules returned.")
         logger.debug(f"{existing_rules=}")
 
-        deleted = purge_branch_protection_rules(requester, existing_rules)
+        processed_rules = purge_branch_protection_rules(requester, existing_rules)
 
-        write_deleted_summary_to_file(deleted)
+        # If any rule deletion ended in an error
+        # Print details and raise exception
+        rules_with_errors = [rule for rule in processed_rules if rule.error]
+        logger.info(f"Processed {len(processed_rules)} rules, {len(rules_with_errors)} with errors.")
+
+        write_deleted_summary_to_file(processed_rules)
+
+        if rules_with_errors:
+            raise RuntimeError(f"The following rules returned errors:\n{rules_with_errors}")
+
     except Exception as e:
-        logger.exception(f"Error {e.__class__.__name__} running script '{__file__}': {e}")
+        logger.exception(f"{e.__class__.__name__}: {e}")
         sys.exit(1)
 
 

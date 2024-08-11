@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.1.7  # disable-secrets-detection
 
       - name: Set up Python
-        uses: actions/setup-python@v5.1.1
+        uses: actions/setup-python@v5.1.1  # disable-secrets-detection
         with:
           python-version: '3.10'
 
@@ -24,7 +24,7 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          poetry install --with ci
+          poetry install --with github-actions
 
           # Override PyGithub version to include GraphQL support and bug fix
           # TODO remove when https://github.com/PyGithub/PyGithub/issues/3001 is fixed
@@ -32,7 +32,7 @@ jobs:
 
       - name: Purge Protection Rules
         env:
-          GITHUB_TOKEN: ${{ secrets.BRANCH_PROTECTION_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CONTENTBOT_GH_ADMIN_TOKEN }}
         run: |
           echo Purging branch protection rules
           poetry run python .github/github_workflow_scripts/purge_branch_protection_rules.py
